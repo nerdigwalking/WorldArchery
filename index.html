@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>World Archery — Daten-Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root{
+      --night:#0D1B2A;
+      --night-mid:#162233;
+      --night-light:#1E3048;
+      --gold:#C8973A;
+      --gold-bright:#E5B04A;
+      --cream:#F0EEE9;
+      --muted:#8A9BB0;
+      --red:#C53030;
+      --green:#2D7A4F;
+      --border:rgba(200,151,58,0.18);
+      --radius:12px;
+    }
+
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--night);color:var(--cream);min-height:100vh;overflow-x:hidden}
+
+    /* ── NAV ── */
+    nav{
+      display:flex;align-items:center;gap:0;
+      background:var(--night-mid);border-bottom:1px solid var(--border);
+      padding:0 6vw;position:sticky;top:0;z-index:50;
+    }
+    .nav-brand{
+      font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;
+      color:var(--cream);padding:14px 24px 14px 0;border-right:1px solid var(--border);margin-right:4px;
+      white-space:nowrap;
+    }
+    .nav-brand span{color:var(--gold)}
+    .nav-tab{
+      padding:16px 20px;font-size:13px;font-weight:600;cursor:pointer;
+      color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;
+      transition:color .2s,border-color .2s;white-space:nowrap;
+    }
+    .nav-tab.active{color:var(--cream);border-bottom-color:var(--gold)}
+    .nav-tab:hover:not(.active){color:var(--cream)}
+
+    /* ── PAGE SECTIONS ── */
+    .page{display:none}
+    .page.active{display:block}
+
+    /* ── HERO ── */
+    .hero{
+      position:relative;display:flex;align-items:center;
+      justify-content:space-between;padding:48px 6vw 40px;
+      overflow:hidden;border-bottom:1px solid var(--border);
+    }
+    .hero::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(ellipse at 75% 50%,rgba(200,151,58,.07) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .hero-text{max-width:520px;z-index:1}
+    .hero-eyebrow{
+      font-size:11px;font-weight:600;letter-spacing:.2em;
+      text-transform:uppercase;color:var(--gold);margin-bottom:14px;
+    }
+    .hero-title{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(44px,6vw,82px);line-height:.92;
+      color:var(--cream);letter-spacing:.02em;
+    }
+    .hero-title span{color:var(--gold)}
+    .hero-sub{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.6;max-width:400px}
+
+    /* ── CORRECT WA TARGET ── */
+    .target-wrap{position:relative;width:240px;height:240px;flex-shrink:0;z-index:1}
+    @keyframes targetPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+    .target-svg{width:100%;height:100%;animation:targetPulse 4s ease-in-out infinite}
+    .arrow-hit{
+      position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-62%) rotate(170deg);
+      animation:arrowIn .7s cubic-bezier(.22,1,.36,1) .5s both;
+    }
+    @keyframes arrowIn{
+      from{transform:translate(-50%,-220%) rotate(170deg);opacity:0}
+      to{transform:translate(-50%,-62%) rotate(170deg);opacity:1}
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:1px;margin:24px 6vw 0;
+      background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+    }
+    .stat-card{background:var(--night-mid);padding:18px 22px;display:flex;flex-direction:column;gap:4px}
+    .stat-value{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--gold);line-height:1}
+    .stat-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+    /* ── CONTROLS ── */
+    .controls{padding:28px 6vw 0;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+    .control-group{display:flex;flex-direction:column;gap:5px}
+    .control-group label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    input,select{
+      background:var(--night-mid);border:1px solid var(--border);color:var(--cream);
+      font-family:'Inter',sans-serif;font-size:13px;padding:9px 13px;border-radius:8px;
+      outline:none;transition:border-color .2s;min-width:130px;
+    }
+    input::placeholder{color:var(--muted)}
+    input:focus,select:focus{border-color:var(--gold)}
+    select option{background:var(--night-mid)}
+    .btn{
+      background:var(--gold);color:var(--night);border:none;
+      font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+      letter-spacing:.07em;text-transform:uppercase;padding:10px 20px;
+      border-radius:8px;cursor:pointer;transition:background .2s,transform .1s;align-self:flex-end;
+    }
+    .btn:hover{background:var(--gold-bright)}
+    .btn:active{transform:scale(.97)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn-ghost{
+      background:var(--night-mid);color:var(--muted);border:1px solid var(--border);
+      font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+      letter-spacing:.06em;text-transform:uppercase;padding:9px 18px;
+      border-radius:8px;cursor:pointer;transition:all .2s;align-self:flex-end;
+    }
+    .btn-ghost:hover{border-color:var(--gold);color:var(--cream)}
+
+    /* ── SECTION ── */
+    .section{padding:32px 6vw 0}
+    .section-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .section-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;color:var(--cream)}
+    .section-line{flex:1;height:1px;background:var(--border)}
+    .section-count{
+      font-size:11px;font-weight:600;color:var(--muted);
+      background:var(--night-mid);padding:3px 10px;border-radius:20px;border:1px solid var(--border);
+    }
+
+    /* ── TABS ── */
+    .tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--night-mid);
+          padding:4px;border-radius:10px;border:1px solid var(--border);width:fit-content}
+    .tab{
+      padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;
+      cursor:pointer;color:var(--muted);transition:all .2s;border:none;background:none;
+    }
+    .tab.active{background:var(--gold);color:var(--night)}
+    .tab:hover:not(.active){color:var(--cream)}
+
+    /* ── COMPETITION CARDS ── */
+    .comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+    .comp-card{
+      background:var(--night-mid);border:1px solid var(--border);border-radius:var(--radius);
+      padding:20px;cursor:pointer;transition:border-color .2s,transform .15s,box-shadow .2s;
+      position:relative;overflow:hidden;
+    }
+    .comp-card::before{
+      content:'';position:absolute;top:0;left:0;width:3px;height:100%;
+      background:var(--gold);opacity:0;transition:opacity .2s;
+    }
+    .comp-card:hover{border-color:rgba(200,151,58,.5);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+    .comp-card:hover::before{opacity:1}
+    .comp-card.live{border-color:rgba(197,48,48,.5)}
+    .comp-card.live::before{background:var(--red);opacity:1}
+    .comp-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+    .comp-name{font-size:14px;font-weight:600;line-height:1.3;color:var(--cream);flex:1;padding-right:8px}
+    .badge{
+      font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      padding:3px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;
+    }
+    .badge-live{background:rgba(197,48,48,.2);color:#FC8181;border:1px solid rgba(197,48,48,.4)}
+    .badge-upcoming{background:rgba(200,151,58,.15);color:var(--gold);border:1px solid rgba(200,151,58,.3)}
+    .badge-finished{background:rgba(45,122,79,.15);color:#68D391;border:1px solid rgba(45,122,79,.3)}
+    .badge-wre{background:rgba(200,151,58,.12);color:var(--gold);border:1px solid var(--border);margin-left:4px}
+    .comp-level{font-size:11px;font-weight:500;color:var(--gold);margin-bottom:8px}
+    .comp-meta{display:flex;gap:14px;flex-wrap:wrap}
+    .comp-meta-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+
+    /* ── ATHLETES ── */
+    .athlete-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .athlete-card{
+      background:var(--night-mid);border:1px solid var(--border);border-radius:var(--radius);
+      padding:20px;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;
+    }
+    .athlete-card:hover{border-color:rgba(200,151,58,.5);transform:translateY(-2px)}
+    .athlete-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+    .athlete-avatar{
+      width:48px;height:48px;border-radius:50%;background:var(--night-light);
+      border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+      font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);
+      flex-shrink:0;overflow:hidden;
+    }
+    .athlete-avatar img{width:100%;height:100%;object-fit:cover}
+    .athlete-name{font-size:15px;font-weight:700;color:var(--cream)}
+    .athlete-noc{font-size:12px;color:var(--muted);margin-top:2px}
+    .athlete-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .athlete-stat{background:var(--night-light);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+    .athlete-stat-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);line-height:1}
+    .athlete-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+    .athlete-cat{display:flex;gap:4px;flex-wrap:wrap;margin-top:12px}
+    .cat-pill{
+      font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+      padding:2px 8px;border-radius:20px;background:var(--night-light);
+      border:1px solid var(--border);color:var(--muted);
+    }
+    .rank-change{font-size:11px;font-weight:600}
+    .rank-up{color:#68D391}
+    .rank-down{color:#FC8181}
+    .rank-same{color:var(--muted)}
+
+    /* ── ATHLETE DETAIL PANEL ── */
+    .detail-panel{
+      position:fixed;right:0;top:0;bottom:0;width:min(500px,100vw);
+      background:var(--night-light);border-left:1px solid var(--border);
+      z-index:100;overflow-y:auto;transform:translateX(100%);
+      transition:transform .3s cubic-bezier(.22,1,.36,1);padding:28px;
+    }
+    .detail-panel.open{transform:translateX(0)}
+    .panel-close{
+      position:absolute;top:14px;right:14px;background:var(--night-mid);
+      border:1px solid var(--border);color:var(--muted);width:32px;height:32px;
+      border-radius:50%;cursor:pointer;font-size:16px;display:flex;
+      align-items:center;justify-content:center;transition:color .2s;
+    }
+    .panel-close:hover{color:var(--cream)}
+    .panel-athlete-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-right:40px}
+    .panel-avatar-lg{
+      width:72px;height:72px;border-radius:50%;background:var(--night-mid);
+      border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+      font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);flex-shrink:0;overflow:hidden;
+    }
+    .panel-avatar-lg img{width:100%;height:100%;object-fit:cover}
+    .panel-name{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1.05}
+    .panel-noc{font-size:13px;color:var(--muted);margin-top:2px}
+    .panel-divider{height:1px;background:var(--border);margin:16px 0}
+    .results-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .result-item{
+      background:var(--night-mid);border-radius:8px;padding:12px;
+      border:1px solid var(--border);display:flex;align-items:center;gap:12px;
+    }
+    .result-rank{
+      font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);
+      width:36px;text-align:center;flex-shrink:0;line-height:1;
+    }
+    .result-rank.gold-medal{color:#F7DC6F}
+    .result-rank.silver-medal{color:#BDC3C7}
+    .result-rank.bronze-medal{color:#E67E22}
+    .result-info{flex:1}
+    .result-name{font-size:13px;font-weight:600;color:var(--cream)}
+    .result-meta{font-size:11px;color:var(--muted);margin-top:2px}
+    .result-cat{
+      font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+      padding:2px 7px;border-radius:4px;background:var(--night-light);
+      border:1px solid var(--border);color:var(--muted);flex-shrink:0;
+    }
+    .panel-section-title{
+      font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--muted);margin-bottom:10px;
+    }
+    .ranking-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+    .ranking-item{
+      background:var(--night-mid);border-radius:8px;padding:12px;
+      border:1px solid var(--border);text-align:center;
+    }
+    .ranking-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1}
+    .ranking-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+    .ranking-pts{font-size:12px;color:var(--muted);margin-top:2px}
+
+    /* ── COUNTRIES / RECORDS ── */
+    .country-search-bar{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;
+      padding:28px 6vw 0;
+    }
+    .countries-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+    .country-item{
+      background:var(--night-mid);border:1px solid var(--border);border-radius:var(--radius);
+      padding:16px 18px;cursor:pointer;transition:border-color .2s,transform .15s;
+      display:flex;align-items:center;gap:12px;
+    }
+    .country-item:hover{border-color:rgba(200,151,58,.5);transform:translateY(-1px)}
+    .country-item.selected{border-color:var(--gold);background:var(--night-light)}
+    .country-noc{
+      font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);
+      width:42px;text-align:center;flex-shrink:0;
+    }
+    .country-name-txt{font-size:13px;font-weight:600;color:var(--cream)}
+    .country-results-count{font-size:11px;color:var(--muted);margin-top:2px}
+
+    /* Records display */
+    .records-panel{padding:24px 6vw 48px}
+    .record-country-header{
+      display:flex;align-items:center;gap:16px;margin-bottom:24px;
+      padding-bottom:16px;border-bottom:1px solid var(--border);
+    }
+    .record-noc-big{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);line-height:1}
+    .record-country-name{font-size:20px;font-weight:700;color:var(--cream)}
+    .record-country-sub{font-size:13px;color:var(--muted);margin-top:4px}
+    .records-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .record-card{
+      background:var(--night-mid);border:1px solid var(--border);border-radius:var(--radius);
+      padding:18px;
+    }
+    .record-event{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+    .record-score{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--cream);line-height:1}
+    .record-athlete{font-size:13px;font-weight:600;color:var(--cream);margin-top:6px}
+    .record-meta{font-size:11px;color:var(--muted);margin-top:4px}
+    .record-comp{font-size:11px;color:var(--muted);margin-top:2px;font-style:italic}
+
+    /* Medal table */
+    .medal-table{width:100%;border-collapse:collapse;font-size:13px}
+    .medal-table th{
+      font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--muted);padding:8px 12px;text-align:left;
+      border-bottom:1px solid var(--border);
+    }
+    .medal-table td{padding:10px 12px;border-bottom:1px solid rgba(200,151,58,.06)}
+    .medal-table tr:hover td{background:var(--night-light)}
+    .medal-table td.center{text-align:center}
+    .medal-gold{color:#F7DC6F;font-weight:700}
+    .medal-silver{color:#BDC3C7;font-weight:700}
+    .medal-bronze{color:#E67E22;font-weight:700}
+    .rnk-badge{
+      font-family:'Bebas Neue',sans-serif;font-size:14px;
+      background:var(--night-light);padding:2px 8px;border-radius:4px;color:var(--muted);
+    }
+
+    /* ── LOADING / EMPTY ── */
+    .state-box{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:12px;padding:48px 20px;color:var(--muted);text-align:center;
+    }
+    .state-box svg{opacity:.4}
+    .state-box p{font-size:14px}
+    .spinner{
+      width:36px;height:36px;border:3px solid var(--border);
+      border-top-color:var(--gold);border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── PAGINATION ── */
+    .pagination{display:flex;gap:6px;justify-content:center;padding:28px 0 40px;align-items:center}
+    .page-btn{
+      background:var(--night-mid);border:1px solid var(--border);color:var(--muted);
+      padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;
+      transition:all .2s;
+    }
+    .page-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+    .page-btn.active{background:var(--gold);color:var(--night);border-color:var(--gold)}
+    .page-btn:disabled{opacity:.3;cursor:not-allowed}
+    .page-info{font-size:12px;color:var(--muted)}
+
+    /* ── OVERLAY ── */
+    .overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99;
+      opacity:0;pointer-events:none;transition:opacity .3s;
+    }
+    .overlay.show{opacity:1;pointer-events:all}
+
+    @media(max-width:640px){
+      .hero{flex-direction:column;gap:24px}
+      .target-wrap{width:180px;height:180px}
+      .controls,.country-search-bar{flex-direction:column}
+      input,select{min-width:unset;width:100%}
+    }
+
+    /* ── NOTICE ── */
+    .api-notice{
+      background:rgba(200,151,58,.08);border:1px solid rgba(200,151,58,.2);
+      border-radius:8px;padding:10px 16px;font-size:12px;color:var(--muted);
+      margin:16px 6vw 0;line-height:1.5;
+    }
+    .api-notice strong{color:var(--gold)}
+  </style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-brand">WORLD <span>ARCHERY</span></div>
+  <button class="nav-tab active" onclick="showPage('competitions',this)">Turniere</button>
+  <button class="nav-tab" onclick="showPage('athletes',this)">Athleten</button>
+  <button class="nav-tab" onclick="showPage('countries',this)">Länder &amp; Rekorde</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════ PAGE: COMPETITIONS ═══ -->
+<div class="page active" id="page-competitions">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">🏹 Internationaler Bogenschießverband</p>
+      <h1 class="hero-title">WORLD<br><span>ARCHERY</span><br>DATEN</h1>
+      <p class="hero-sub">Turniere, Athleten und Weltranglistendaten in Echtzeit aus der offiziellen World Archery API.</p>
+    </div>
+    <!-- CORRECT WA TARGET: White(1-2), Black(3-4), Blue(5-6), Red(7-8), Yellow(9-10) -->
+    <div class="target-wrap">
+      <svg class="target-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+        <!-- White rings 1-2 -->
+        <circle cx="120" cy="120" r="118" fill="#FFFFFF"/>
+        <!-- Separator line between 1 & 2 -->
+        <circle cx="120" cy="120" r="106" fill="none" stroke="#CCCCCC" stroke-width="0.8"/>
+        <!-- Black rings 3-4 -->
+        <circle cx="120" cy="120" r="94" fill="#1A1A1A"/>
+        <circle cx="120" cy="120" r="82" fill="none" stroke="#333333" stroke-width="0.8"/>
+        <!-- Blue rings 5-6 -->
+        <circle cx="120" cy="120" r="70" fill="#006CB7"/>
+        <circle cx="120" cy="120" r="58" fill="none" stroke="#0059A0" stroke-width="0.8"/>
+        <!-- Red rings 7-8 -->
+        <circle cx="120" cy="120" r="46" fill="#EE1C25"/>
+        <circle cx="120" cy="120" r="34" fill="none" stroke="#CC1020" stroke-width="0.8"/>
+        <!-- Yellow (gold) rings 9-10 -->
+        <circle cx="120" cy="120" r="22" fill="#F7E63A"/>
+        <!-- X ring (inner 10) -->
+        <circle cx="120" cy="120" r="11" fill="#F7E63A" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/>
+        <!-- Cross hair -->
+        <line x1="120" y1="113" x2="120" y2="127" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+        <line x1="113" y1="120" x2="127" y2="120" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+        <!-- Ring number labels -->
+        <text x="120" y="99" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">6</text>
+        <text x="120" y="87" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">5</text>
+        <text x="120" y="75" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">7</text>
+        <text x="120" y="63" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">8</text>
+        <text x="120" y="51" text-anchor="middle" fill="black" font-size="7" font-family="Inter" font-weight="600">9</text>
+        <!-- Outer numbers on white -->
+        <text x="120" y="26" text-anchor="middle" fill="#999" font-size="7" font-family="Inter" font-weight="600">1</text>
+        <text x="120" y="38" text-anchor="middle" fill="#999" font-size="7" font-family="Inter" font-weight="600">2</text>
+        <text x="120" y="110" text-anchor="middle" fill="#555" font-size="7" font-family="Inter" font-weight="600">4</text>
+        <text x="120" y="122" text-anchor="middle" fill="#555" font-size="7" font-family="Inter" font-weight="600">3</text>
+        <!-- Thin border -->
+        <circle cx="120" cy="120" r="118" fill="none" stroke="rgba(200,151,58,0.3)" stroke-width="1"/>
+      </svg>
+      <!-- Arrow -->
+      <svg class="arrow-hit" width="16" height="80" viewBox="0 0 16 80">
+        <rect x="7" y="12" width="2" height="60" fill="#C8973A" rx="1"/>
+        <polygon points="8,0 3,15 13,15" fill="#E5B04A"/>
+        <rect x="5" y="68" width="6" height="3" fill="#8B7355" rx="1"/>
+        <line x1="6" y1="72" x2="4" y2="80" stroke="#8B7355" stroke-width="1.5"/>
+        <line x1="10" y1="72" x2="12" y2="80" stroke="#8B7355" stroke-width="1.5"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Turniere gesamt</div></div>
+    <div class="stat-card"><div class="stat-value" id="statLive" style="color:var(--red)">—</div><div class="stat-label">Live gerade</div></div>
+    <div class="stat-card"><div class="stat-value" id="statUpcoming">—</div><div class="stat-label">Kommende</div></div>
+    <div class="stat-card"><div class="stat-value" id="statWRE">—</div><div class="stat-label">World Ranking Events</div></div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="control-group">
+      <label>Suche</label>
+      <input type="text" id="compSearch" placeholder="Turniersuche …"/>
+    </div>
+    <div class="control-group">
+      <label>Von</label>
+      <input type="date" id="compStart"/>
+    </div>
+    <div class="control-group">
+      <label>Bis</label>
+      <input type="date" id="compEnd"/>
+    </div>
+    <div class="control-group">
+      <label>WRE</label>
+      <select id="compWRE">
+        <option value="0">Alle</option>
+        <option value="1">Nur WRE</option>
+        <option value="-1">Kein WRE</option>
+      </select>
+    </div>
+    <button class="btn" id="compSearchBtn" onclick="fetchCompetitions(1)">Suchen</button>
+  </div>
+
+  <!-- LIST -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Turniere</h2>
+      <div class="section-line"></div>
+      <div class="section-count" id="compCount">—</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="setCompTab('all',this)">Alle</button>
+      <button class="tab" onclick="setCompTab('live',this)">🔴 Live</button>
+      <button class="tab" onclick="setCompTab('upcoming',this)">Kommend</button>
+      <button class="tab" onclick="setCompTab('finished',this)">Beendet</button>
+    </div>
+    <div id="compGrid" class="comp-grid"></div>
+    <div id="compPagination" class="pagination"></div>
+  </section>
+</div><!-- /page-competitions -->
+
+<!-- ═══════════════════════════════════════════════ PAGE: ATHLETES ═══ -->
+<div class="page" id="page-athletes">
+
+  <div class="controls" style="padding-top:32px">
+    <div class="control-group">
+      <label>Name / WA-ID</label>
+      <input type="text" id="athleteSearch" placeholder="Name suchen …"/>
+    </div>
+    <div class="control-group">
+      <label>Kategorie</label>
+      <select id="athleteCat">
+        <option value="RM">Recurve Men (RM)</option>
+        <option value="RW">Recurve Women (RW)</option>
+        <option value="CM">Compound Men (CM)</option>
+        <option value="CW">Compound Women (CW)</option>
+        <option value="RM10">Recurve Men Indoor (RM10)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Land (NOC)</label>
+      <input type="text" id="athleteCountry" placeholder="z.B. GER" maxlength="3" style="min-width:80px;max-width:90px;text-transform:uppercase"/>
+    </div>
+    <div class="control-group">
+      <label>Top</label>
+      <select id="athleteRankMax">
+        <option value="20">Top 20</option>
+        <option value="50">Top 50</option>
+        <option value="100">Top 100</option>
+      </select>
+    </div>
+    <button class="btn" id="athleteSearchBtn" onclick="fetchAthletes()">Suchen</button>
+  </div>
+
+  <div class="api-notice" id="athleteNotice" style="display:none"></div>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Weltrangliste</h2>
+      <div class="section-line"></div>
+      <div class="section-count" id="athleteCount">—</div>
+    </div>
+    <div id="athleteGrid" class="athlete-grid"></div>
+    <div id="athletePagination" class="pagination"></div>
+  </section>
+</div><!-- /page-athletes -->
+
+<!-- ═══════════════════════════════════════════════ PAGE: COUNTRIES ═══ -->
+<div class="page" id="page-countries">
+
+  <div class="country-search-bar">
+    <div class="control-group">
+      <label>Land (NOC-Code)</label>
+      <input type="text" id="countryNocInput" placeholder="z.B. GER, KOR, USA …" maxlength="3" style="text-transform:uppercase;max-width:120px"/>
+    </div>
+    <div class="control-group">
+      <label>Kategorie</label>
+      <select id="countryCat">
+        <option value="">Alle</option>
+        <option value="RM">Recurve Men</option>
+        <option value="RW">Recurve Women</option>
+        <option value="CM">Compound Men</option>
+        <option value="CW">Compound Women</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Von</label>
+      <input type="date" id="countryStart"/>
+    </div>
+    <div class="control-group">
+      <label>Bis</label>
+      <input type="date" id="countryEnd"/>
+    </div>
+    <button class="btn" onclick="fetchCountryData()">Laden</button>
+    <button class="btn-ghost" onclick="clearCountryView()">Zurücksetzen</button>
+  </div>
+
+  <!-- Quickselect top nations -->
+  <section class="section" style="margin-top:20px">
+    <div class="section-header">
+      <h2 class="section-title">Top-Nationen</h2>
+      <div class="section-line"></div>
+      <div class="section-count">Schnellauswahl</div>
+    </div>
+    <div class="countries-list" id="topNationsList"></div>
+  </section>
+
+  <!-- Results area -->
+  <div id="countryResultsArea"></div>
+
+</div><!-- /page-countries -->
+
+<!-- DETAIL PANEL (for competitions + athletes) -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<aside class="detail-panel" id="detailPanel">
+  <button class="panel-close" onclick="closePanel()">✕</button>
+  <div id="panelContent"></div>
+</aside>
+
+<script>
+// ═══════════════════════════════════ UTILS ═══════════════════════════════════
+const BASE_COMP  = 'https://api.worldarchery.org/v3/COMPETITIONS/';
+const BASE_RANK  = 'http://api.worldarchery.org/v3/WORLDRANKINGS/';
+const BASE_ARES  = 'https://api.worldarchery.org/v3/ATHLETERESULTS/';
+const BASE_CRES  = 'https://api.worldarchery.org/v3/COUNTRYRESULTS/';
+const PHOTO_BASE = 'https://extranet.worldarchery.org/ProfilePictures/?Id=';
+
+function formatDate(d){
+  if(!d) return '—';
+  return new Date(d).toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'numeric'});
+}
+function getStatus(c){
+  if(c.IsLive) return{label:'LIVE',cls:'badge-live'};
+  const today=new Date(); today.setHours(0,0,0,0);
+  const s=new Date(c.DFrom), e=new Date(c.DTo);
+  if(s>today) return{label:'Kommend',cls:'badge-upcoming'};
+  if(e<today) return{label:'Beendet',cls:'badge-finished'};
+  return{label:'Laufend',cls:'badge-live'};
+}
+function athleteName(a){
+  if(!a) return '—';
+  return a.WNameOrd ? `${a.FName} ${a.GName}` : `${a.GName} ${a.FName}`;
+}
+function initials(a){
+  if(!a) return '?';
+  const parts=athleteName(a).split(' ');
+  return parts.map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
+}
+function rankChange(r,ro){
+  if(!ro||ro===r) return `<span class="rank-change rank-same">→</span>`;
+  if(r<ro) return `<span class="rank-change rank-up">▲${ro-r}</span>`;
+  return `<span class="rank-change rank-down">▼${r-ro}</span>`;
+}
+function medalRankCls(r){
+  if(r===1) return 'gold-medal';
+  if(r===2) return 'silver-medal';
+  if(r===3) return 'bronze-medal';
+  return '';
+}
+
+// ═══════════════════════════════════ NAV ═══════════════════════════════════
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='countries' && !topNationsRendered) renderTopNations();
+  closePanel();
+}
+
+// ═══════════════════════════════════ PANEL ═══════════════════════════════════
+function openPanel(){
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('detailPanel').classList.add('open');
+}
+function closePanel(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('detailPanel').classList.remove('open');
+}
+
+// ═══════════════════════════════════ COMPETITIONS ═══════════════════════════
+let compTab='all', compPage=1, compTotal=0;
+const COMP_RBP=12;
+
+const now=new Date();
+document.getElementById('compStart').value=`${now.getFullYear()}-01-01`;
+document.getElementById('compEnd').value  =`${now.getFullYear()}-12-31`;
+document.getElementById('countryStart').value=`${now.getFullYear()-5}-01-01`;
+document.getElementById('countryEnd').value  =`${now.getFullYear()}-12-31`;
+
+function buildCompParams(page){
+  const p=new URLSearchParams();
+  const search=document.getElementById('compSearch').value.trim();
+  const sd=document.getElementById('compStart').value;
+  const ed=document.getElementById('compEnd').value;
+  const wre=document.getElementById('compWRE').value;
+  if(search) p.set('fText',search);
+  if(sd) p.set('StartDate',sd);
+  if(ed) p.set('EndDate',ed);
+  if(wre!=='0') p.set('WorldRankingEvent',wre);
+  p.set('Cancelled','-1');
+  p.set('SortBy','DATE');
+  if(compTab==='live') p.set('Live','true');
+  p.set('RBP',COMP_RBP);
+  p.set('Page',page-1);
+  return p.toString();
+}
+
+function compFilterTab(items){
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(compTab==='all') return items;
+  if(compTab==='live') return items.filter(c=>c.IsLive);
+  if(compTab==='upcoming') return items.filter(c=>!c.IsLive&&new Date(c.DFrom)>today);
+  if(compTab==='finished') return items.filter(c=>!c.IsLive&&new Date(c.DTo)<today);
+  return items;
+}
+
+async function fetchCompetitions(page=1){
+  compPage=page;
+  const grid=document.getElementById('compGrid');
+  const pag=document.getElementById('compPagination');
+  grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Lade Turniere …</p></div>`;
+  pag.innerHTML='';
+  document.getElementById('compSearchBtn').disabled=true;
+  try{
+    const res=await fetch(`${BASE_COMP}?${buildCompParams(page)}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();
+    const items=data.items||[];
+    compTotal=data.pageInfo?.totalResults||items.length;
+    const today=new Date(); today.setHours(0,0,0,0);
+    document.getElementById('statTotal').textContent=compTotal.toLocaleString('de-DE');
+    document.getElementById('statLive').textContent=items.filter(c=>c.IsLive).length;
+    document.getElementById('statUpcoming').textContent=items.filter(c=>!c.IsLive&&new Date(c.DFrom)>today).length;
+    document.getElementById('statWRE').textContent=items.filter(c=>c.WorldRankingEvent).length;
+    const filtered=compFilterTab(items);
+    document.getElementById('compCount').textContent=compTotal.toLocaleString('de-DE')+' Ergebnisse';
+    if(!filtered.length){
+      grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><p>Keine Turniere gefunden.</p></div>`;
+    } else {
+      grid.innerHTML=filtered.map(renderCompCard).join('');
+    }
+    renderPagination('comp',compTotal,page,COMP_RBP,fetchCompetitions);
+  }catch(e){
+    grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>Fehler: ${e.message}</p></div>`;
+  }finally{
+    document.getElementById('compSearchBtn').disabled=false;
+  }
+}
+
+function renderCompCard(c){
+  const st=getStatus(c);
+  const lc=c.IsLive?' live':'';
+  const wre=c.WorldRankingEvent?`<span class="badge badge-wre">WRE</span>`:'';
+  const cats=[...(c.CatInd||[]).map(x=>x.Code),...(c.CatTeam||[]).map(x=>x.Code)];
+  const uc=[...new Set(cats)].slice(0,4);
+  return`<div class="comp-card${lc}" onclick="openCompPanel(${c.ID})">
+    <div class="comp-card-top">
+      <div class="comp-name">${c.Name}</div>
+      <div style="display:flex;gap:4px;flex-shrink:0"><span class="badge ${st.cls}">${st.label}</span>${wre}</div>
+    </div>
+    <div class="comp-level">${c.Level||''}${c.SubLevel?' · '+c.SubLevel:''}</div>
+    <div class="comp-meta">
+      <div class="comp-meta-item">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1C4.24 1 2 3.24 2 6c0 3.75 5 8 5 8s5-4.25 5-8c0-2.76-2.24-5-5-5Zm0 6.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z" fill="currentColor" opacity=".6"/></svg>
+        ${c.Place||'—'}, ${c.Country||''}
+      </div>
+      <div class="comp-meta-item">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".6"/><path d="M1 5h12" stroke="currentColor" stroke-width="1.2" opacity=".6"/></svg>
+        ${formatDate(c.DFrom)} – ${formatDate(c.DTo)}
+      </div>
+      ${uc.length?`<div class="comp-meta-item">${uc.map(x=>`<span style="font-size:10px;background:var(--night-light);padding:1px 6px;border-radius:4px;color:var(--muted)">${x}</span>`).join(' ')}</div>`:''}
+    </div>
+  </div>`;
+}
+
+let compCache={};
+async function openCompPanel(id){
+  openPanel();
+  document.getElementById('panelContent').innerHTML=`<div class="state-box"><div class="spinner"></div></div>`;
+  try{
+    if(!compCache[id]){
+      const res=await fetch(`${BASE_COMP}?CompId=${id}&Detailed=true`);
+      const data=await res.json();
+      compCache[id]=data.items?.[0];
+    }
+    const c=compCache[id]; if(!c) throw new Error('Nicht gefunden');
+    const st=getStatus(c);
+    const phases=c.CatInd?.[0]?.Phases||[];
+    const cats=[...new Set([...(c.CatInd||[]).map(x=>x.Code),...(c.CatTeam||[]).map(x=>x.Code)])];
+    document.getElementById('panelContent').innerHTML=`
+      <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">${c.Level||''}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1.05;margin-bottom:4px">${c.Name}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:18px">${c.Venue?c.Venue+', ':''}${c.Place||''}, ${c.CountryName||c.Country||''}</div>
+      <div style="display:flex;gap:6px;margin-bottom:16px"><span class="badge ${st.cls}">${st.label}</span>${c.WorldRankingEvent?'<span class="badge badge-wre">WRE</span>':''}</div>
+      <div class="panel-divider"></div>
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
+        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">Datum</span><span>${formatDate(c.DFrom)} – ${formatDate(c.DTo)}</span>
+        ${c.StatusDescription?`<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">Status</span><span>${c.StatusDescription}</span>`:''}
+        ${c.WorldRecordStatus?`<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">WR-Status</span><span style="color:#68D391">✓ Weltrekord-Status</span>`:''}
+      </div>
+      ${cats.length?`<div class="panel-divider"></div><div class="panel-section-title">Kategorien</div><div style="display:flex;gap:6px;flex-wrap:wrap">${cats.map(x=>`<span class="cat-pill">${x}</span>`).join('')}</div>`:''}
+      ${c.Stages?.length?`<div class="panel-divider"></div><div class="panel-section-title">Verfügbare Daten</div><div style="display:flex;flex-direction:column;gap:6px">${c.Stages.map(s=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 10px;background:var(--night-mid);border-radius:6px;border:1px solid var(--border)"><span>${s}</span><span style="color:#68D391">✓</span></div>`).join('')}</div>`:''}
+      ${phases.length?`<div class="panel-divider"></div><div class="panel-section-title">Ausscheidungsrunden (RM)</div><div style="display:flex;flex-direction:column;gap:5px">${phases.map(p=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 10px;background:var(--night-mid);border-radius:6px;border:1px solid var(--border)"><span>${p.Name}</span><span style="${p.Finished?'color:#68D391':'color:var(--muted)'}">${p.Finished?'✓':'○'}</span></div>`).join('')}</div>`:''}
+      ${c.Links&&Object.values(c.Links).some(v=>v)?`<div class="panel-divider"></div><div class="panel-section-title">Links</div>${Object.entries(c.Links).filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;gap:8px;margin-bottom:6px"><span style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);width:60px;flex-shrink:0">${k}</span><a href="${v.startsWith('http')?v:'https://'+v}" target="_blank" style="font-size:13px;color:var(--gold)">${v}</a></div>`).join('')}`:''}
+      <div style="height:32px"></div>`;
+  }catch(e){
+    document.getElementById('panelContent').innerHTML=`<p style="color:var(--muted)">Fehler: ${e.message}</p>`;
+  }
+}
+
+function setCompTab(tab,el){
+  compTab=tab;
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  fetchCompetitions(1);
+}
+
+document.getElementById('compSearch').addEventListener('keydown',e=>{if(e.key==='Enter') fetchCompetitions(1)});
+
+// ═══════════════════════════════════ ATHLETES ═══════════════════════════════
+let athletePage=1, athleteTotal=0;
+const ATHLETE_RBP=15;
+
+async function fetchAthletes(page=1){
+  athletePage=page;
+  const grid=document.getElementById('athleteGrid');
+  const pag=document.getElementById('athletePagination');
+  grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Lade Weltrangliste …</p></div>`;
+  pag.innerHTML='';
+  document.getElementById('athleteSearchBtn').disabled=true;
+  document.getElementById('athleteNotice').style.display='none';
+  try{
+    const cat=document.getElementById('athleteCat').value;
+    const search=document.getElementById('athleteSearch').value.trim();
+    const country=document.getElementById('athleteCountry').value.trim().toUpperCase();
+    const rankMax=document.getElementById('athleteRankMax').value;
+    const p=new URLSearchParams();
+    p.set('CatCode',cat);
+    p.set('RankMax',rankMax);
+    if(search) p.set('fText',search);
+    if(country) p.set('Country',country);
+    p.set('SortBy','RANKING');
+    p.set('RBP',ATHLETE_RBP);
+    p.set('Page',page-1);
+
+    // WorldRankings needs http not https (as per API docs)
+    const url=`http://api.worldarchery.org/v3/WORLDRANKINGS/?${p.toString()}`;
+    const res=await fetch(url);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();
+    const items=data.items||[];
+    athleteTotal=data.pageInfo?.totalResults||items.length;
+    document.getElementById('athleteCount').textContent=athleteTotal.toLocaleString('de-DE')+' Athleten ('+cat+')';
+
+    if(!items.length){
+      grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>Keine Athleten gefunden.</p></div>`;
+    } else {
+      grid.innerHTML=items.map(renderAthleteCard).join('');
+    }
+    renderPagination('athlete',athleteTotal,page,ATHLETE_RBP,fetchAthletes);
+  }catch(e){
+    grid.innerHTML='';
+    const n=document.getElementById('athleteNotice');
+    n.style.display='block';
+    n.innerHTML=`<strong>Hinweis:</strong> Die Weltranglisten-API (http://) kann je nach Browser-Sicherheitseinstellungen geblockt sein (Mixed Content). Bitte öffne die Seite lokal oder über einen Server. Fehler: ${e.message}`;
+  }finally{
+    document.getElementById('athleteSearchBtn').disabled=false;
+  }
+}
+
+function renderAthleteCard(r){
+  const a=r.Athlete;
+  const name=athleteName(a);
+  const ini=initials(a);
+  const chg=rankChange(r.Rnk,r.RnkOld);
+  return`<div class="athlete-card" onclick="openAthletePanel('${a.Id}','${name}','${a.NOC}')">
+    <div class="athlete-top">
+      <div class="athlete-avatar" id="ava-${a.Id}">
+        <img src="${PHOTO_BASE}${a.Id}" alt="" onerror="this.parentElement.textContent='${ini}'" loading="lazy"/>
+      </div>
+      <div>
+        <div class="athlete-name">${name}</div>
+        <div class="athlete-noc">${a.NOC} ${chg}</div>
+      </div>
+    </div>
+    <div class="athlete-stats">
+      <div class="athlete-stat">
+        <div class="athlete-stat-val">#${r.Rnk}</div>
+        <div class="athlete-stat-lbl">Weltrang</div>
+      </div>
+      <div class="athlete-stat">
+        <div class="athlete-stat-val">${r.Points}</div>
+        <div class="athlete-stat-lbl">Punkte</div>
+      </div>
+    </div>
+    <div class="athlete-cat" style="margin-top:10px">
+      <span class="cat-pill">${r.Cat}</span>
+      ${r.RnkDtIssued?`<span style="font-size:10px;color:var(--muted);padding-top:2px">Stand: ${formatDate(r.RnkDtIssued)}</span>`:''}
+    </div>
+  </div>`;
+}
+
+async function openAthletePanel(id, name, noc){
+  openPanel();
+  const pc=document.getElementById('panelContent');
+  pc.innerHTML=`<div style="padding-top:40px" class="state-box"><div class="spinner"></div><p>Lade Athleten-Daten …</p></div>`;
+  try{
+    const cat=document.getElementById('athleteCat').value;
+    // Load ranking details + recent results in parallel
+    const [rankRes, resultsRes] = await Promise.all([
+      fetch(`http://api.worldarchery.org/v3/WORLDRANKINGS/?Id=${id}&SortBy=RANKING&RBP=10`),
+      fetch(`https://api.worldarchery.org/v3/ATHLETERESULTS/?Id=${id}&SortBy=-DATE&RBP=10&IndividualTeam=1`)
+    ]);
+    const rankData   = rankRes.ok   ? await rankRes.json()    : {items:[]};
+    const resultsData= resultsRes.ok ? await resultsRes.json() : {items:[]};
+    const ranks  = rankData.items||[];
+    const results= resultsData.items||[];
+
+    const ini=id.slice(0,2).toUpperCase();
+    pc.innerHTML=`
+      <div class="panel-athlete-header">
+        <div class="panel-avatar-lg">
+          <img src="${PHOTO_BASE}${id}" alt="" onerror="this.parentElement.textContent='${ini}'" loading="lazy"/>
+        </div>
+        <div>
+          <div class="panel-name">${name}</div>
+          <div class="panel-noc">${noc} · WA-ID: ${id}</div>
+        </div>
+      </div>
+      ${ranks.length?`
+      <div class="panel-section-title">Weltranglistenpositionen</div>
+      <div class="ranking-grid">
+        ${ranks.map(r=>`
+          <div class="ranking-item">
+            <div class="ranking-val">#${r.Rnk}</div>
+            <div class="ranking-lbl">${r.Cat}</div>
+            <div class="ranking-pts">${r.Points} Pkt.</div>
+          </div>`).join('')}
+      </div>`:''}
+      ${results.length?`
+      <div class="panel-divider"></div>
+      <div class="panel-section-title">Letzte Ergebnisse (Einzel)</div>
+      <div class="results-list">
+        ${results.map(r=>`
+          <div class="result-item">
+            <div class="result-rank ${medalRankCls(r.Rnk)}">${r.Rnk||'—'}</div>
+            <div class="result-info">
+              <div class="result-name">${r.Name||r.NameShort||'—'}</div>
+              <div class="result-meta">${formatDate(r.DFrom)} · ${r.ComLevelDescr||''} · ${r.Country||''}</div>
+              ${r.QuScore?`<div class="result-meta">QR: ${r.QuScore} (Rang ${r.QuRnk||'—'})</div>`:''}
+            </div>
+            <span class="result-cat">${r.Cat||''}</span>
+          </div>`).join('')}
+      </div>`:`<div class="panel-divider"></div><p style="color:var(--muted);font-size:13px">Keine Einzelergebnisse gefunden.</p>`}
+      <div style="height:32px"></div>`;
+  }catch(e){
+    pc.innerHTML=`<p style="color:var(--muted);padding-top:40px">Fehler beim Laden: ${e.message}</p>`;
+  }
+}
+
+document.getElementById('athleteSearch').addEventListener('keydown',e=>{if(e.key==='Enter') fetchAthletes(1)});
+
+// ═══════════════════════════════════ COUNTRIES / RECORDS ═══════════════════
+const TOP_NATIONS=[
+  {noc:'KOR',name:'Südkorea'},{noc:'USA',name:'USA'},{noc:'FRA',name:'Frankreich'},
+  {noc:'ITA',name:'Italien'},{noc:'IND',name:'Indien'},{noc:'TUR',name:'Türkei'},
+  {noc:'MEX',name:'Mexiko'},{noc:'NED',name:'Niederlande'},{noc:'GER',name:'Deutschland'},
+  {noc:'JPN',name:'Japan'},{noc:'CHN',name:'China'},{noc:'TPE',name:'Chinese Taipei'},
+];
+
+let topNationsRendered=false;
+function renderTopNations(){
+  topNationsRendered=true;
+  document.getElementById('topNationsList').innerHTML=
+    TOP_NATIONS.map(n=>`
+      <div class="country-item" id="ni-${n.noc}" onclick="quickSelectNation('${n.noc}','${n.name}',this)">
+        <div class="country-noc">${n.noc}</div>
+        <div><div class="country-name-txt">${n.name}</div><div class="country-results-count">Klicken zum Laden</div></div>
+      </div>`).join('');
+}
+
+function quickSelectNation(noc,name,el){
+  document.querySelectorAll('.country-item').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('countryNocInput').value=noc;
+  fetchCountryData();
+}
+
+async function fetchCountryData(){
+  const noc=document.getElementById('countryNocInput').value.trim().toUpperCase();
+  if(!noc){alert('Bitte einen NOC-Code eingeben (z.B. GER)');return;}
+  const cat=document.getElementById('countryCat').value;
+  const sd=document.getElementById('countryStart').value;
+  const ed=document.getElementById('countryEnd').value;
+
+  const area=document.getElementById('countryResultsArea');
+  area.innerHTML=`<div class="section"><div class="state-box"><div class="spinner"></div><p>Lade Daten für ${noc} …</p></div></div>`;
+
+  // Highlight in quick list
+  document.querySelectorAll('.country-item').forEach(c=>{
+    c.classList.remove('selected');
+    const nocEl=c.querySelector('.country-noc');
+    if(nocEl&&nocEl.textContent===noc) c.classList.add('selected');
+  });
+
+  try{
+    const p=new URLSearchParams();
+    p.set('Noc',noc);
+    if(cat) p.set('CatCode',cat);
+    if(sd) p.set('StartDate',sd);
+    if(ed) p.set('EndDate',ed);
+    p.set('IndividualTeam','1'); // individual only
+    p.set('RBP','50');
+    p.set('Page','0');
+
+    const res=await fetch(`${BASE_CRES}?${p.toString()}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();
+    const items=data.items||[];
+    const total=data.pageInfo?.totalResults||items.length;
+
+    // Find nation name
+    const nationName=TOP_NATIONS.find(n=>n.noc===noc)?.name||noc;
+
+    // Stats: medals (rank 1,2,3), best results
+    const gold=items.filter(r=>r.Rnk===1);
+    const silver=items.filter(r=>r.Rnk===2);
+    const bronze=items.filter(r=>r.Rnk===3);
+    const top3=items.filter(r=>r.Rnk<=3);
+
+    // Group by athlete
+    const byAthlete={};
+    items.forEach(r=>{
+      const k=r.WaId;
+      if(!byAthlete[k]) byAthlete[k]={name:`${r.GName||''} ${r.FName||''}`.trim(),noc:r.NOC,id:r.WaId,gold:0,silver:0,bronze:0,results:[]};
+      if(r.Rnk===1) byAthlete[k].gold++;
+      else if(r.Rnk===2) byAthlete[k].silver++;
+      else if(r.Rnk===3) byAthlete[k].bronze++;
+      byAthlete[k].results.push(r);
+    });
+    const athletes=Object.values(byAthlete).sort((a,b)=>b.gold-a.gold||(b.silver-a.silver)||(b.bronze-a.bronze));
+
+    // Build best results table (top 20 by rank, then date)
+    const bestResults=items.filter(r=>r.Rnk<=10).sort((a,b)=>a.Rnk-b.Rnk||new Date(b.DFrom)-new Date(a.DFrom)).slice(0,30);
+
+    area.innerHTML=`
+      <div class="records-panel">
+        <div class="record-country-header">
+          <div class="record-noc-big">${noc}</div>
+          <div>
+            <div class="record-country-name">${nationName}</div>
+            <div class="record-country-sub">${total.toLocaleString('de-DE')} Einzel-Ergebnisse · ${sd?formatDate(sd):''} – ${ed?formatDate(ed):''}</div>
+          </div>
+        </div>
+
+        <!-- Medal summary -->
+        <div class="stats-bar" style="margin:0 0 28px">
+          <div class="stat-card"><div class="stat-value" style="color:#F7DC6F">${gold.length}</div><div class="stat-label">🥇 Gold</div></div>
+          <div class="stat-card"><div class="stat-value" style="color:#BDC3C7">${silver.length}</div><div class="stat-label">🥈 Silber</div></div>
+          <div class="stat-card"><div class="stat-value" style="color:#E67E22">${bronze.length}</div><div class="stat-label">🥉 Bronze</div></div>
+          <div class="stat-card"><div class="stat-value">${athletes.length}</div><div class="stat-label">Athleten</div></div>
+        </div>
+
+        <!-- Athlete medal table -->
+        ${athletes.length?`
+        <div class="section-header" style="margin-bottom:14px">
+          <h2 class="section-title">Athleten nach Medaillen</h2>
+          <div class="section-line"></div>
+        </div>
+        <div style="overflow-x:auto;margin-bottom:28px">
+          <table class="medal-table">
+            <thead>
+              <tr>
+                <th>Athlet</th>
+                <th class="center">🥇</th>
+                <th class="center">🥈</th>
+                <th class="center">🥉</th>
+                <th class="center">Top-3 ges.</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${athletes.filter(a=>a.gold+a.silver+a.bronze>0).slice(0,20).map((a,i)=>`
+                <tr>
+                  <td><span class="rnk-badge">${i+1}</span> &nbsp;${a.name}</td>
+                  <td class="center medal-gold">${a.gold||'—'}</td>
+                  <td class="center medal-silver">${a.silver||'—'}</td>
+                  <td class="center medal-bronze">${a.bronze||'—'}</td>
+                  <td class="center" style="color:var(--muted)">${a.gold+a.silver+a.bronze}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`:''}
+
+        <!-- Best results list -->
+        ${bestResults.length?`
+        <div class="section-header" style="margin-bottom:14px">
+          <h2 class="section-title">Beste Einzelresultate (Top 10)</h2>
+          <div class="section-line"></div>
+        </div>
+        <div class="results-list">
+          ${bestResults.map(r=>`
+            <div class="result-item">
+              <div class="result-rank ${medalRankCls(r.Rnk)}">${r.Rnk}</div>
+              <div class="result-info">
+                <div class="result-name">${r.GName||''} ${r.FName||''}</div>
+                <div class="result-meta">${r.Name||r.NameShort||'—'} · ${formatDate(r.DFrom)} · ${r.Country||''}</div>
+                <div class="result-meta">${r.ComLevelDescr||''}</div>
+              </div>
+              <span class="result-cat">${r.Cat||''}</span>
+            </div>`).join('')}
+        </div>`:''}
+
+        ${!items.length?`<div class="state-box"><p>Keine Ergebnisse gefunden für ${noc} im gewählten Zeitraum.</p></div>`:''}
+      </div>`;
+  }catch(e){
+    area.innerHTML=`<div class="section"><div class="state-box"><p>Fehler: ${e.message}</p></div></div>`;
+  }
+}
+
+function clearCountryView(){
+  document.getElementById('countryResultsArea').innerHTML='';
+  document.getElementById('countryNocInput').value='';
+  document.querySelectorAll('.country-item').forEach(c=>c.classList.remove('selected'));
+}
+
+// ═══════════════════════════════════ PAGINATION ═══════════════════════════════
+function renderPagination(prefix, total, page, rbp, fetchFn){
+  const pages=Math.ceil(total/rbp);
+  const pag=document.getElementById(`${prefix}Pagination`);
+  if(pages<=1){pag.innerHTML='';return;}
+  let html=`<button class="page-btn" onclick="fetchFns['${prefix}'](${page-1})" ${page<=1?'disabled':''}>← Zurück</button>`;
+  const s=Math.max(1,page-2), e=Math.min(pages,page+2);
+  if(s>1) html+=`<button class="page-btn" onclick="fetchFns['${prefix}'](1)">1</button>${s>2?'<span class="page-info">…</span>':''}`;
+  for(let i=s;i<=e;i++) html+=`<button class="page-btn ${i===page?'active':''}" onclick="fetchFns['${prefix}'](${i})">${i}</button>`;
+  if(e<pages) html+=`${e<pages-1?'<span class="page-info">…</span>':''}<button class="page-btn" onclick="fetchFns['${prefix}'](${pages})">${pages}</button>`;
+  html+=`<button class="page-btn" onclick="fetchFns['${prefix}'](${page+1})" ${page>=pages?'disabled':''}>Weiter →</button>`;
+  pag.innerHTML=html;
+}
+const fetchFns={comp:fetchCompetitions, athlete:fetchAthletes};
+
+// ═══════════════════════════════════ INIT ═══════════════════════════════════
+fetchCompetitions(1);
+</script>
+</body>
+</html>
