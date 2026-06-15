@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>World Archery — Daten-Dashboard</title>
+  <title>World Archery — Data Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -372,6 +372,61 @@
       margin:16px 6vw 0;line-height:1.5;
     }
     .api-notice strong{color:var(--gold)}
+
+    /* ── RECORDS SUB-NAV ── */
+    .rec-subnav{
+      padding:14px 22px;font-size:13px;font-weight:600;cursor:pointer;
+      color:var(--muted);border:none;background:none;
+      border-bottom:2px solid transparent;transition:color .2s,border-color .2s;
+    }
+    .rec-subnav.active{color:var(--cream);border-bottom-color:var(--gold)}
+    .rec-subnav:hover:not(.active){color:var(--cream)}
+
+    /* ── NOC CHIPS ── */
+    .noc-chip{
+      font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.06em;
+      padding:5px 12px;border-radius:6px;cursor:pointer;
+      background:var(--night-mid);border:1px solid var(--border);color:var(--muted);
+      transition:all .15s;
+    }
+    .noc-chip:hover{border-color:var(--gold);color:var(--gold)}
+
+    /* ── RECORDS TABLE ── */
+    .records-section{padding:28px 6vw 0}
+    .rec-group{margin-bottom:36px}
+    .rec-group-title{
+      font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;
+      color:var(--cream);margin-bottom:12px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .rec-group-disc{
+      font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--gold);background:rgba(200,151,58,.12);
+      border:1px solid rgba(200,151,58,.25);padding:3px 9px;border-radius:4px;
+    }
+    table.rec-table{width:100%;border-collapse:collapse;font-size:13px}
+    table.rec-table th{
+      font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--muted);padding:8px 12px;text-align:left;
+      border-bottom:1px solid var(--border);white-space:nowrap;
+    }
+    table.rec-table td{
+      padding:11px 12px;border-bottom:1px solid rgba(200,151,58,.06);
+      vertical-align:middle;
+    }
+    table.rec-table tr:hover td{background:var(--night-light)}
+    table.rec-table .score-cell{
+      font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);
+      line-height:1;white-space:nowrap;
+    }
+    table.rec-table .cat-cell{
+      font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      padding:2px 8px;border-radius:4px;background:var(--night-light);
+      border:1px solid var(--border);color:var(--muted);display:inline-block;
+    }
+    table.rec-table .event-cell{font-weight:600;color:var(--cream)}
+    table.rec-table .meta-cell{color:var(--muted);font-size:12px}
+    table.rec-table .date-cell{color:var(--muted);font-size:12px;white-space:nowrap}
   </style>
 </head>
 <body>
@@ -379,9 +434,9 @@
 <!-- NAVIGATION -->
 <nav>
   <div class="nav-brand">WORLD <span>ARCHERY</span></div>
-  <button class="nav-tab active" onclick="showPage('competitions',this)">Turniere</button>
-  <button class="nav-tab" onclick="showPage('athletes',this)">Athleten</button>
-  <button class="nav-tab" onclick="showPage('countries',this)">Länder &amp; Rekorde</button>
+  <button class="nav-tab active" onclick="showPage('competitions',this)">Competitions</button>
+  <button class="nav-tab" onclick="showPage('athletes',this)">Athletes</button>
+  <button class="nav-tab" onclick="showPage('countries',this)">Records</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════════ PAGE: COMPETITIONS ═══ -->
@@ -390,9 +445,9 @@
   <!-- HERO -->
   <header class="hero">
     <div class="hero-text">
-      <p class="hero-eyebrow">🏹 Internationaler Bogenschießverband</p>
-      <h1 class="hero-title">WORLD<br><span>ARCHERY</span><br>DATEN</h1>
-      <p class="hero-sub">Turniere, Athleten und Weltranglistendaten in Echtzeit aus der offiziellen World Archery API.</p>
+      <p class="hero-eyebrow">🏹 International Archery Federation</p>
+      <h1 class="hero-title">WORLD<br><span>ARCHERY</span><br>DATA</h1>
+      <p class="hero-sub">Competitions, athletes and world ranking data in real time from the official World Archery API.</p>
     </div>
     <!-- CORRECT WA TARGET: White(1-2), Black(3-4), Blue(5-6), Red(7-8), Yellow(9-10) -->
     <div class="target-wrap">
@@ -417,17 +472,7 @@
         <!-- Cross hair -->
         <line x1="120" y1="113" x2="120" y2="127" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
         <line x1="113" y1="120" x2="127" y2="120" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
-        <!-- Ring number labels -->
-        <text x="120" y="99" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">6</text>
-        <text x="120" y="87" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">5</text>
-        <text x="120" y="75" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">7</text>
-        <text x="120" y="63" text-anchor="middle" fill="white" font-size="7" font-family="Inter" font-weight="600">8</text>
-        <text x="120" y="51" text-anchor="middle" fill="black" font-size="7" font-family="Inter" font-weight="600">9</text>
-        <!-- Outer numbers on white -->
-        <text x="120" y="26" text-anchor="middle" fill="#999" font-size="7" font-family="Inter" font-weight="600">1</text>
-        <text x="120" y="38" text-anchor="middle" fill="#999" font-size="7" font-family="Inter" font-weight="600">2</text>
-        <text x="120" y="110" text-anchor="middle" fill="#555" font-size="7" font-family="Inter" font-weight="600">4</text>
-        <text x="120" y="122" text-anchor="middle" fill="#555" font-size="7" font-family="Inter" font-weight="600">3</text>
+
         <!-- Thin border -->
         <circle cx="120" cy="120" r="118" fill="none" stroke="rgba(200,151,58,0.3)" stroke-width="1"/>
       </svg>
@@ -444,49 +489,49 @@
 
   <!-- STATS BAR -->
   <div class="stats-bar">
-    <div class="stat-card"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Turniere gesamt</div></div>
-    <div class="stat-card"><div class="stat-value" id="statLive" style="color:var(--red)">—</div><div class="stat-label">Live gerade</div></div>
-    <div class="stat-card"><div class="stat-value" id="statUpcoming">—</div><div class="stat-label">Kommende</div></div>
+    <div class="stat-card"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total competitions</div></div>
+    <div class="stat-card"><div class="stat-value" id="statLive" style="color:var(--red)">—</div><div class="stat-label">Live now</div></div>
+    <div class="stat-card"><div class="stat-value" id="statUpcoming">—</div><div class="stat-label">Upcoming</div></div>
     <div class="stat-card"><div class="stat-value" id="statWRE">—</div><div class="stat-label">World Ranking Events</div></div>
   </div>
 
   <!-- CONTROLS -->
   <div class="controls">
     <div class="control-group">
-      <label>Suche</label>
-      <input type="text" id="compSearch" placeholder="Turniersuche …"/>
+      <label>Search</label>
+      <input type="text" id="compSearch" placeholder="Search competitions …"/>
     </div>
     <div class="control-group">
-      <label>Von</label>
+      <label>From</label>
       <input type="date" id="compStart"/>
     </div>
     <div class="control-group">
-      <label>Bis</label>
+      <label>To</label>
       <input type="date" id="compEnd"/>
     </div>
     <div class="control-group">
       <label>WRE</label>
       <select id="compWRE">
-        <option value="0">Alle</option>
-        <option value="1">Nur WRE</option>
-        <option value="-1">Kein WRE</option>
+        <option value="0">All</option>
+        <option value="1">WRE only</option>
+        <option value="-1">No WRE</option>
       </select>
     </div>
-    <button class="btn" id="compSearchBtn" onclick="fetchCompetitions(1)">Suchen</button>
+    <button class="btn" id="compSearchBtn" onclick="fetchCompetitions(1)">Search</button>
   </div>
 
   <!-- LIST -->
   <section class="section">
     <div class="section-header">
-      <h2 class="section-title">Turniere</h2>
+      <h2 class="section-title">Competitions</h2>
       <div class="section-line"></div>
       <div class="section-count" id="compCount">—</div>
     </div>
     <div class="tabs">
-      <button class="tab active" onclick="setCompTab('all',this)">Alle</button>
+      <button class="tab active" onclick="setCompTab('all',this)">All</button>
       <button class="tab" onclick="setCompTab('live',this)">🔴 Live</button>
-      <button class="tab" onclick="setCompTab('upcoming',this)">Kommend</button>
-      <button class="tab" onclick="setCompTab('finished',this)">Beendet</button>
+      <button class="tab" onclick="setCompTab('upcoming',this)">Upcoming</button>
+      <button class="tab" onclick="setCompTab('finished',this)">Finished</button>
     </div>
     <div id="compGrid" class="comp-grid"></div>
     <div id="compPagination" class="pagination"></div>
@@ -498,11 +543,11 @@
 
   <div class="controls" style="padding-top:32px">
     <div class="control-group">
-      <label>Name / WA-ID</label>
-      <input type="text" id="athleteSearch" placeholder="Name suchen …"/>
+      <label>Name / WA ID</label>
+      <input type="text" id="athleteSearch" placeholder="Search by name …"/>
     </div>
     <div class="control-group">
-      <label>Kategorie</label>
+      <label>Category</label>
       <select id="athleteCat">
         <option value="RM">Recurve Men (RM)</option>
         <option value="RW">Recurve Women (RW)</option>
@@ -512,25 +557,17 @@
       </select>
     </div>
     <div class="control-group">
-      <label>Land (NOC)</label>
-      <input type="text" id="athleteCountry" placeholder="z.B. GER" maxlength="3" style="min-width:80px;max-width:90px;text-transform:uppercase"/>
+      <label>Country (NOC)</label>
+      <input type="text" id="athleteCountry" placeholder="e.g. GER" maxlength="3" style="min-width:80px;max-width:90px;text-transform:uppercase"/>
     </div>
-    <div class="control-group">
-      <label>Top</label>
-      <select id="athleteRankMax">
-        <option value="20">Top 20</option>
-        <option value="50">Top 50</option>
-        <option value="100">Top 100</option>
-      </select>
-    </div>
-    <button class="btn" id="athleteSearchBtn" onclick="fetchAthletes()">Suchen</button>
+    <button class="btn" id="athleteSearchBtn" onclick="fetchAthletes()">Search</button>
   </div>
 
   <div class="api-notice" id="athleteNotice" style="display:none"></div>
 
   <section class="section">
     <div class="section-header">
-      <h2 class="section-title">Weltrangliste</h2>
+      <h2 class="section-title">World Rankings</h2>
       <div class="section-line"></div>
       <div class="section-count" id="athleteCount">—</div>
     </div>
@@ -539,48 +576,82 @@
   </section>
 </div><!-- /page-athletes -->
 
-<!-- ═══════════════════════════════════════════════ PAGE: COUNTRIES ═══ -->
+<!-- ═══════════════════════════════════════════════ PAGE: RECORDS ═══ -->
 <div class="page" id="page-countries">
 
-  <div class="country-search-bar">
+  <!-- Sub-nav: World Records vs National Records -->
+  <div style="background:var(--night-mid);border-bottom:1px solid var(--border);padding:0 6vw;display:flex;gap:0">
+    <button class="rec-subnav active" id="subnav-world" onclick="switchRecordMode('world',this)">🌍 World Records</button>
+    <button class="rec-subnav" id="subnav-national" onclick="switchRecordMode('national',this)">🏳️ National Records</button>
+  </div>
+
+  <!-- WORLD RECORDS controls -->
+  <div id="wr-controls" class="controls" style="padding-top:24px">
     <div class="control-group">
-      <label>Land (NOC-Code)</label>
-      <input type="text" id="countryNocInput" placeholder="z.B. GER, KOR, USA …" maxlength="3" style="text-transform:uppercase;max-width:120px"/>
+      <label>Record Level</label>
+      <select id="wrLevel">
+        <option value="1">World Record</option>
+        <option value="2">Olympic Record</option>
+        <option value="3">World Cup Record</option>
+        <option value="5">World Championships Record</option>
+      </select>
     </div>
     <div class="control-group">
-      <label>Kategorie</label>
-      <select id="countryCat">
-        <option value="">Alle</option>
+      <label>Category</label>
+      <select id="wrCat">
+        <option value="">All</option>
         <option value="RM">Recurve Men</option>
         <option value="RW">Recurve Women</option>
         <option value="CM">Compound Men</option>
         <option value="CW">Compound Women</option>
+        <option value="RM10">Recurve Men Indoor</option>
+        <option value="RW10">Recurve Women Indoor</option>
+        <option value="CM10">Compound Men Indoor</option>
+        <option value="CW10">Compound Women Indoor</option>
       </select>
     </div>
-    <div class="control-group">
-      <label>Von</label>
-      <input type="date" id="countryStart"/>
-    </div>
-    <div class="control-group">
-      <label>Bis</label>
-      <input type="date" id="countryEnd"/>
-    </div>
-    <button class="btn" onclick="fetchCountryData()">Laden</button>
-    <button class="btn-ghost" onclick="clearCountryView()">Zurücksetzen</button>
+    <button class="btn" onclick="fetchWorldRecords()">Load</button>
   </div>
 
-  <!-- Quickselect top nations -->
-  <section class="section" style="margin-top:20px">
-    <div class="section-header">
-      <h2 class="section-title">Top-Nationen</h2>
-      <div class="section-line"></div>
-      <div class="section-count">Schnellauswahl</div>
+  <!-- NATIONAL RECORDS controls -->
+  <div id="nr-controls" class="controls" style="padding-top:24px;display:none">
+    <div class="control-group">
+      <label>Country (NOC)</label>
+      <input type="text" id="nrNoc" placeholder="e.g. GER" maxlength="3"
+             style="text-transform:uppercase;max-width:110px"/>
     </div>
-    <div class="countries-list" id="topNationsList"></div>
-  </section>
+    <div class="control-group">
+      <label>Category</label>
+      <select id="nrCat">
+        <option value="">All</option>
+        <option value="RM">Recurve Men</option>
+        <option value="RW">Recurve Women</option>
+        <option value="CM">Compound Men</option>
+        <option value="CW">Compound Women</option>
+        <option value="RM10">Recurve Men Indoor</option>
+        <option value="RW10">Recurve Women Indoor</option>
+        <option value="CM10">Compound Men Indoor</option>
+        <option value="CW10">Compound Women Indoor</option>
+      </select>
+    </div>
+    <button class="btn" onclick="fetchNationalRecords()">Load</button>
 
-  <!-- Results area -->
-  <div id="countryResultsArea"></div>
+    <!-- Quick-select nations -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-self:flex-end">
+      <span style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);align-self:center">Quick:</span>
+      <button class="noc-chip" onclick="quickNoc('GER')">GER</button>
+      <button class="noc-chip" onclick="quickNoc('USA')">USA</button>
+      <button class="noc-chip" onclick="quickNoc('KOR')">KOR</button>
+      <button class="noc-chip" onclick="quickNoc('FRA')">FRA</button>
+      <button class="noc-chip" onclick="quickNoc('ITA')">ITA</button>
+      <button class="noc-chip" onclick="quickNoc('IND')">IND</button>
+      <button class="noc-chip" onclick="quickNoc('NED')">NED</button>
+      <button class="noc-chip" onclick="quickNoc('TUR')">TUR</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="recordsArea" style="padding-bottom:48px"></div>
 
 </div><!-- /page-countries -->
 
@@ -594,7 +665,7 @@
 <script>
 // ═══════════════════════════════════ UTILS ═══════════════════════════════════
 const BASE_COMP  = 'https://api.worldarchery.org/v3/COMPETITIONS/';
-const BASE_RANK  = 'http://api.worldarchery.org/v3/WORLDRANKINGS/';
+const BASE_RANK  = 'https://api.worldarchery.org/v3/WORLDRANKINGS/';
 const BASE_ARES  = 'https://api.worldarchery.org/v3/ATHLETERESULTS/';
 const BASE_CRES  = 'https://api.worldarchery.org/v3/COUNTRYRESULTS/';
 const PHOTO_BASE = 'https://extranet.worldarchery.org/ProfilePictures/?Id=';
@@ -607,9 +678,9 @@ function getStatus(c){
   if(c.IsLive) return{label:'LIVE',cls:'badge-live'};
   const today=new Date(); today.setHours(0,0,0,0);
   const s=new Date(c.DFrom), e=new Date(c.DTo);
-  if(s>today) return{label:'Kommend',cls:'badge-upcoming'};
-  if(e<today) return{label:'Beendet',cls:'badge-finished'};
-  return{label:'Laufend',cls:'badge-live'};
+  if(s>today) return{label:'Upcoming',cls:'badge-upcoming'};
+  if(e<today) return{label:'Finished',cls:'badge-finished'};
+  return{label:'Ongoing',cls:'badge-live'};
 }
 function athleteName(a){
   if(!a) return '—';
@@ -638,7 +709,9 @@ function showPage(id,btn){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='countries' && !topNationsRendered) renderTopNations();
+  if(id==='countries' && !document.getElementById('recordsArea').innerHTML.trim()){
+    fetchWorldRecords();
+  }
   closePanel();
 }
 
@@ -685,15 +758,14 @@ function compFilterTab(items){
   if(compTab==='all') return items;
   if(compTab==='live') return items.filter(c=>c.IsLive);
   if(compTab==='upcoming') return items.filter(c=>!c.IsLive&&new Date(c.DFrom)>today);
-  if(compTab==='finished') return items.filter(c=>!c.IsLive&&new Date(c.DTo)<today);
-  return items;
+  if(compTab==='finished') return items.filter(c=>!c.IsLive&&new Date(c.DTo)<today);  return items;
 }
 
 async function fetchCompetitions(page=1){
   compPage=page;
   const grid=document.getElementById('compGrid');
   const pag=document.getElementById('compPagination');
-  grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Lade Turniere …</p></div>`;
+  grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Loading competitions …</p></div>`;
   pag.innerHTML='';
   document.getElementById('compSearchBtn').disabled=true;
   try{
@@ -703,20 +775,20 @@ async function fetchCompetitions(page=1){
     const items=data.items||[];
     compTotal=data.pageInfo?.totalResults||items.length;
     const today=new Date(); today.setHours(0,0,0,0);
-    document.getElementById('statTotal').textContent=compTotal.toLocaleString('de-DE');
+    document.getElementById('statTotal').textContent=compTotal.toLocaleString('en');
     document.getElementById('statLive').textContent=items.filter(c=>c.IsLive).length;
     document.getElementById('statUpcoming').textContent=items.filter(c=>!c.IsLive&&new Date(c.DFrom)>today).length;
     document.getElementById('statWRE').textContent=items.filter(c=>c.WorldRankingEvent).length;
     const filtered=compFilterTab(items);
-    document.getElementById('compCount').textContent=compTotal.toLocaleString('de-DE')+' Ergebnisse';
+    document.getElementById('compCount').textContent=compTotal.toLocaleString('en')+' results';
     if(!filtered.length){
-      grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><p>Keine Turniere gefunden.</p></div>`;
+      grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><p>No competitions found.</p></div>`;
     } else {
       grid.innerHTML=filtered.map(renderCompCard).join('');
     }
     renderPagination('comp',compTotal,page,COMP_RBP,fetchCompetitions);
   }catch(e){
-    grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>Fehler: ${e.message}</p></div>`;
+    grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>Error: ${e.message}</p></div>`;
   }finally{
     document.getElementById('compSearchBtn').disabled=false;
   }
@@ -758,7 +830,7 @@ async function openCompPanel(id){
       const data=await res.json();
       compCache[id]=data.items?.[0];
     }
-    const c=compCache[id]; if(!c) throw new Error('Nicht gefunden');
+    const c=compCache[id]; if(!c) throw new Error('Not found');
     const st=getStatus(c);
     const phases=c.CatInd?.[0]?.Phases||[];
     const cats=[...new Set([...(c.CatInd||[]).map(x=>x.Code),...(c.CatTeam||[]).map(x=>x.Code)])];
@@ -769,17 +841,17 @@ async function openCompPanel(id){
       <div style="display:flex;gap:6px;margin-bottom:16px"><span class="badge ${st.cls}">${st.label}</span>${c.WorldRankingEvent?'<span class="badge badge-wre">WRE</span>':''}</div>
       <div class="panel-divider"></div>
       <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
-        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">Datum</span><span>${formatDate(c.DFrom)} – ${formatDate(c.DTo)}</span>
+        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">Dates</span><span>${formatDate(c.DFrom)} – ${formatDate(c.DTo)}</span>
         ${c.StatusDescription?`<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">Status</span><span>${c.StatusDescription}</span>`:''}
-        ${c.WorldRecordStatus?`<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">WR-Status</span><span style="color:#68D391">✓ Weltrekord-Status</span>`:''}
+        ${c.WorldRecordStatus?`<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-top:2px">WR Status</span><span style="color:#68D391">✓ World Record Status</span>`:''}
       </div>
-      ${cats.length?`<div class="panel-divider"></div><div class="panel-section-title">Kategorien</div><div style="display:flex;gap:6px;flex-wrap:wrap">${cats.map(x=>`<span class="cat-pill">${x}</span>`).join('')}</div>`:''}
-      ${c.Stages?.length?`<div class="panel-divider"></div><div class="panel-section-title">Verfügbare Daten</div><div style="display:flex;flex-direction:column;gap:6px">${c.Stages.map(s=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 10px;background:var(--night-mid);border-radius:6px;border:1px solid var(--border)"><span>${s}</span><span style="color:#68D391">✓</span></div>`).join('')}</div>`:''}
-      ${phases.length?`<div class="panel-divider"></div><div class="panel-section-title">Ausscheidungsrunden (RM)</div><div style="display:flex;flex-direction:column;gap:5px">${phases.map(p=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 10px;background:var(--night-mid);border-radius:6px;border:1px solid var(--border)"><span>${p.Name}</span><span style="${p.Finished?'color:#68D391':'color:var(--muted)'}">${p.Finished?'✓':'○'}</span></div>`).join('')}</div>`:''}
+      ${cats.length?`<div class="panel-divider"></div><div class="panel-section-title">Categories</div><div style="display:flex;gap:6px;flex-wrap:wrap">${cats.map(x=>`<span class="cat-pill">${x}</span>`).join('')}</div>`:''}
+      ${c.Stages?.length?`<div class="panel-divider"></div><div class="panel-section-title">Available Data</div><div style="display:flex;flex-direction:column;gap:6px">${c.Stages.map(s=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 10px;background:var(--night-mid);border-radius:6px;border:1px solid var(--border)"><span>${s}</span><span style="color:#68D391">✓</span></div>`).join('')}</div>`:''}
+      ${phases.length?`<div class="panel-divider"></div><div class="panel-section-title">Elimination Rounds (RM)</div><div style="display:flex;flex-direction:column;gap:5px">${phases.map(p=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 10px;background:var(--night-mid);border-radius:6px;border:1px solid var(--border)"><span>${p.Name}</span><span style="${p.Finished?'color:#68D391':'color:var(--muted)'}">${p.Finished?'✓':'○'}</span></div>`).join('')}</div>`:''}
       ${c.Links&&Object.values(c.Links).some(v=>v)?`<div class="panel-divider"></div><div class="panel-section-title">Links</div>${Object.entries(c.Links).filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;gap:8px;margin-bottom:6px"><span style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);width:60px;flex-shrink:0">${k}</span><a href="${v.startsWith('http')?v:'https://'+v}" target="_blank" style="font-size:13px;color:var(--gold)">${v}</a></div>`).join('')}`:''}
       <div style="height:32px"></div>`;
   }catch(e){
-    document.getElementById('panelContent').innerHTML=`<p style="color:var(--muted)">Fehler: ${e.message}</p>`;
+    document.getElementById('panelContent').innerHTML=`<p style="color:var(--muted)">Error: ${e.message}</p>`;
   }
 }
 
@@ -800,7 +872,7 @@ async function fetchAthletes(page=1){
   athletePage=page;
   const grid=document.getElementById('athleteGrid');
   const pag=document.getElementById('athletePagination');
-  grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Lade Weltrangliste …</p></div>`;
+  grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Loading world rankings …</p></div>`;
   pag.innerHTML='';
   document.getElementById('athleteSearchBtn').disabled=true;
   document.getElementById('athleteNotice').style.display='none';
@@ -808,27 +880,24 @@ async function fetchAthletes(page=1){
     const cat=document.getElementById('athleteCat').value;
     const search=document.getElementById('athleteSearch').value.trim();
     const country=document.getElementById('athleteCountry').value.trim().toUpperCase();
-    const rankMax=document.getElementById('athleteRankMax').value;
     const p=new URLSearchParams();
     p.set('CatCode',cat);
-    p.set('RankMax',rankMax);
     if(search) p.set('fText',search);
     if(country) p.set('Country',country);
     p.set('SortBy','RANKING');
     p.set('RBP',ATHLETE_RBP);
     p.set('Page',page-1);
 
-    // WorldRankings needs http not https (as per API docs)
-    const url=`http://api.worldarchery.org/v3/WORLDRANKINGS/?${p.toString()}`;
+    const url=`https://api.worldarchery.org/v3/WORLDRANKINGS/?${p.toString()}`;
     const res=await fetch(url);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data=await res.json();
     const items=data.items||[];
     athleteTotal=data.pageInfo?.totalResults||items.length;
-    document.getElementById('athleteCount').textContent=athleteTotal.toLocaleString('de-DE')+' Athleten ('+cat+')';
+    document.getElementById('athleteCount').textContent=athleteTotal.toLocaleString('en')+' athletes ('+cat+')';
 
     if(!items.length){
-      grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>Keine Athleten gefunden.</p></div>`;
+      grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>No athletes found.</p></div>`;
     } else {
       grid.innerHTML=items.map(renderAthleteCard).join('');
     }
@@ -837,7 +906,7 @@ async function fetchAthletes(page=1){
     grid.innerHTML='';
     const n=document.getElementById('athleteNotice');
     n.style.display='block';
-    n.innerHTML=`<strong>Hinweis:</strong> Die Weltranglisten-API (http://) kann je nach Browser-Sicherheitseinstellungen geblockt sein (Mixed Content). Bitte öffne die Seite lokal oder über einen Server. Fehler: ${e.message}`;
+    n.innerHTML=`<strong>Note:</strong> Failed to load rankings. Error: ${e.message}`;
   }finally{
     document.getElementById('athleteSearchBtn').disabled=false;
   }
@@ -861,16 +930,16 @@ function renderAthleteCard(r){
     <div class="athlete-stats">
       <div class="athlete-stat">
         <div class="athlete-stat-val">#${r.Rnk}</div>
-        <div class="athlete-stat-lbl">Weltrang</div>
+        <div class="athlete-stat-lbl">World Rank</div>
       </div>
       <div class="athlete-stat">
         <div class="athlete-stat-val">${r.Points}</div>
-        <div class="athlete-stat-lbl">Punkte</div>
+        <div class="athlete-stat-lbl">Points</div>
       </div>
     </div>
     <div class="athlete-cat" style="margin-top:10px">
       <span class="cat-pill">${r.Cat}</span>
-      ${r.RnkDtIssued?`<span style="font-size:10px;color:var(--muted);padding-top:2px">Stand: ${formatDate(r.RnkDtIssued)}</span>`:''}
+      ${r.RnkDtIssued?`<span style="font-size:10px;color:var(--muted);padding-top:2px">As of: ${formatDate(r.RnkDtIssued)}</span>`:''}
     </div>
   </div>`;
 }
@@ -878,12 +947,12 @@ function renderAthleteCard(r){
 async function openAthletePanel(id, name, noc){
   openPanel();
   const pc=document.getElementById('panelContent');
-  pc.innerHTML=`<div style="padding-top:40px" class="state-box"><div class="spinner"></div><p>Lade Athleten-Daten …</p></div>`;
+  pc.innerHTML=`<div style="padding-top:40px" class="state-box"><div class="spinner"></div><p>Loading athlete data …</p></div>`;
   try{
     const cat=document.getElementById('athleteCat').value;
     // Load ranking details + recent results in parallel
     const [rankRes, resultsRes] = await Promise.all([
-      fetch(`http://api.worldarchery.org/v3/WORLDRANKINGS/?Id=${id}&SortBy=RANKING&RBP=10`),
+      fetch(`https://api.worldarchery.org/v3/WORLDRANKINGS/?Id=${id}&SortBy=RANKING&RBP=10`),
       fetch(`https://api.worldarchery.org/v3/ATHLETERESULTS/?Id=${id}&SortBy=-DATE&RBP=10&IndividualTeam=1`)
     ]);
     const rankData   = rankRes.ok   ? await rankRes.json()    : {items:[]};
@@ -903,18 +972,18 @@ async function openAthletePanel(id, name, noc){
         </div>
       </div>
       ${ranks.length?`
-      <div class="panel-section-title">Weltranglistenpositionen</div>
+      <div class="panel-section-title">World Ranking Positions</div>
       <div class="ranking-grid">
         ${ranks.map(r=>`
           <div class="ranking-item">
             <div class="ranking-val">#${r.Rnk}</div>
             <div class="ranking-lbl">${r.Cat}</div>
-            <div class="ranking-pts">${r.Points} Pkt.</div>
+            <div class="ranking-pts">${r.Points} pts</div>
           </div>`).join('')}
       </div>`:''}
       ${results.length?`
       <div class="panel-divider"></div>
-      <div class="panel-section-title">Letzte Ergebnisse (Einzel)</div>
+      <div class="panel-section-title">Recent Results (Individual)</div>
       <div class="results-list">
         ${results.map(r=>`
           <div class="result-item">
@@ -922,180 +991,181 @@ async function openAthletePanel(id, name, noc){
             <div class="result-info">
               <div class="result-name">${r.Name||r.NameShort||'—'}</div>
               <div class="result-meta">${formatDate(r.DFrom)} · ${r.ComLevelDescr||''} · ${r.Country||''}</div>
-              ${r.QuScore?`<div class="result-meta">QR: ${r.QuScore} (Rang ${r.QuRnk||'—'})</div>`:''}
+              ${r.QuScore?`<div class="result-meta">QR: ${r.QuScore} (Rank ${r.QuRnk||'—'})</div>`:''}
             </div>
             <span class="result-cat">${r.Cat||''}</span>
           </div>`).join('')}
-      </div>`:`<div class="panel-divider"></div><p style="color:var(--muted);font-size:13px">Keine Einzelergebnisse gefunden.</p>`}
+      </div>`:`<div class="panel-divider"></div><p style="color:var(--muted);font-size:13px">No individual results found.</p>`}
       <div style="height:32px"></div>`;
   }catch(e){
-    pc.innerHTML=`<p style="color:var(--muted);padding-top:40px">Fehler beim Laden: ${e.message}</p>`;
+    pc.innerHTML=`<p style="color:var(--muted);padding-top:40px">Error loading data: ${e.message}</p>`;
   }
 }
 
 document.getElementById('athleteSearch').addEventListener('keydown',e=>{if(e.key==='Enter') fetchAthletes(1)});
 
-// ═══════════════════════════════════ COUNTRIES / RECORDS ═══════════════════
-const TOP_NATIONS=[
-  {noc:'KOR',name:'Südkorea'},{noc:'USA',name:'USA'},{noc:'FRA',name:'Frankreich'},
-  {noc:'ITA',name:'Italien'},{noc:'IND',name:'Indien'},{noc:'TUR',name:'Türkei'},
-  {noc:'MEX',name:'Mexiko'},{noc:'NED',name:'Niederlande'},{noc:'GER',name:'Deutschland'},
-  {noc:'JPN',name:'Japan'},{noc:'CHN',name:'China'},{noc:'TPE',name:'Chinese Taipei'},
-];
+// ═══════════════════════════════════ RECORDS ═══════════════════════════════════
+const BASE_REC = 'https://api.worldarchery.org/v3/RECORDS/';
 
-let topNationsRendered=false;
-function renderTopNations(){
-  topNationsRendered=true;
-  document.getElementById('topNationsList').innerHTML=
-    TOP_NATIONS.map(n=>`
-      <div class="country-item" id="ni-${n.noc}" onclick="quickSelectNation('${n.noc}','${n.name}',this)">
-        <div class="country-noc">${n.noc}</div>
-        <div><div class="country-name-txt">${n.name}</div><div class="country-results-count">Klicken zum Laden</div></div>
-      </div>`).join('');
-}
+// Map record level IDs to display labels
+const REC_LEVEL_LABELS = {1:'World Record',2:'Olympic Record',3:'World Cup Record',5:'World Championships Record'};
 
-function quickSelectNation(noc,name,el){
-  document.querySelectorAll('.country-item').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('countryNocInput').value=noc;
-  fetchCountryData();
-}
+// Cat code → readable label
+const CAT_LABELS = {
+  RM:'Recurve Men',RW:'Recurve Women',CM:'Compound Men',CW:'Compound Women',
+  RM10:'Recurve Men Indoor',RW10:'Recurve Women Indoor',
+  CM10:'Compound Men Indoor',CW10:'Compound Women Indoor',
+  BM:'Barebow Men',BW:'Barebow Women',
+};
+function catLabel(c){return CAT_LABELS[c]||c;}
 
-async function fetchCountryData(){
-  const noc=document.getElementById('countryNocInput').value.trim().toUpperCase();
-  if(!noc){alert('Bitte einen NOC-Code eingeben (z.B. GER)');return;}
-  const cat=document.getElementById('countryCat').value;
-  const sd=document.getElementById('countryStart').value;
-  const ed=document.getElementById('countryEnd').value;
-
-  const area=document.getElementById('countryResultsArea');
-  area.innerHTML=`<div class="section"><div class="state-box"><div class="spinner"></div><p>Lade Daten für ${noc} …</p></div></div>`;
-
-  // Highlight in quick list
-  document.querySelectorAll('.country-item').forEach(c=>{
-    c.classList.remove('selected');
-    const nocEl=c.querySelector('.country-noc');
-    if(nocEl&&nocEl.textContent===noc) c.classList.add('selected');
+// Group records by Discipline then Category
+function groupRecords(items){
+  const groups={};
+  items.forEach(r=>{
+    const disc=r.DisDescr||r.Dis||'Other';
+    const cat=r.CatCode||r.Cat||'';
+    const key=`${disc}||${cat}`;
+    if(!groups[key]) groups[key]={disc,cat,label:catLabel(cat),items:[]};
+    groups[key].items.push(r);
   });
+  return Object.values(groups).sort((a,b)=>a.disc.localeCompare(b.disc)||a.cat.localeCompare(b.cat));
+}
 
-  try{
-    const p=new URLSearchParams();
-    p.set('Noc',noc);
-    if(cat) p.set('CatCode',cat);
-    if(sd) p.set('StartDate',sd);
-    if(ed) p.set('EndDate',ed);
-    p.set('IndividualTeam','1'); // individual only
-    p.set('RBP','50');
-    p.set('Page','0');
+function recTableRows(items){
+  return items.map(r=>{
+    const holders = r.Athletes?.map(a=>
+      a.WNameOrd ? `${a.FName} ${a.GName}` : `${a.GName} ${a.FName}`
+    ).join(' / ') || r.AthleteName || '—';
+    const noc = r.Athletes?.[0]?.NOC || r.NOC || '';
+    const event = r.EventDescr || r.Event || '—';
+    const score = r.Score ?? r.Pts ?? '—';
+    const place = r.Place ? `${r.Place}${r.Country?' ('+r.Country+')':''}` : (r.CompName||'');
+    const date  = r.Date ? formatDate(r.Date) : (r.DFrom ? formatDate(r.DFrom) : '—');
+    const isTeam = r.IsTeam || (r.Athletes?.length > 1);
+    return `<tr>
+      <td class="event-cell">${event}${isTeam?' <span style="font-size:10px;color:var(--muted)">(Team)</span>':''}</td>
+      <td class="score-cell">${score}</td>
+      <td>${holders}</td>
+      <td class="meta-cell">${noc}</td>
+      <td class="meta-cell">${place}</td>
+      <td class="date-cell">${date}</td>
+    </tr>`;
+  }).join('');
+}
 
-    const res=await fetch(`${BASE_CRES}?${p.toString()}`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data=await res.json();
-    const items=data.items||[];
-    const total=data.pageInfo?.totalResults||items.length;
-
-    // Find nation name
-    const nationName=TOP_NATIONS.find(n=>n.noc===noc)?.name||noc;
-
-    // Stats: medals (rank 1,2,3), best results
-    const gold=items.filter(r=>r.Rnk===1);
-    const silver=items.filter(r=>r.Rnk===2);
-    const bronze=items.filter(r=>r.Rnk===3);
-    const top3=items.filter(r=>r.Rnk<=3);
-
-    // Group by athlete
-    const byAthlete={};
-    items.forEach(r=>{
-      const k=r.WaId;
-      if(!byAthlete[k]) byAthlete[k]={name:`${r.GName||''} ${r.FName||''}`.trim(),noc:r.NOC,id:r.WaId,gold:0,silver:0,bronze:0,results:[]};
-      if(r.Rnk===1) byAthlete[k].gold++;
-      else if(r.Rnk===2) byAthlete[k].silver++;
-      else if(r.Rnk===3) byAthlete[k].bronze++;
-      byAthlete[k].results.push(r);
-    });
-    const athletes=Object.values(byAthlete).sort((a,b)=>b.gold-a.gold||(b.silver-a.silver)||(b.bronze-a.bronze));
-
-    // Build best results table (top 20 by rank, then date)
-    const bestResults=items.filter(r=>r.Rnk<=10).sort((a,b)=>a.Rnk-b.Rnk||new Date(b.DFrom)-new Date(a.DFrom)).slice(0,30);
-
-    area.innerHTML=`
-      <div class="records-panel">
-        <div class="record-country-header">
-          <div class="record-noc-big">${noc}</div>
-          <div>
-            <div class="record-country-name">${nationName}</div>
-            <div class="record-country-sub">${total.toLocaleString('de-DE')} Einzel-Ergebnisse · ${sd?formatDate(sd):''} – ${ed?formatDate(ed):''}</div>
+function renderRecordTable(groups, title, subtitle){
+  if(!groups.length) return `<div class="state-box" style="padding:40px"><p>No records found.</p></div>`;
+  return `
+    <div class="records-section">
+      <div style="margin-bottom:24px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.04em">${title}</div>
+        ${subtitle?`<div style="font-size:13px;color:var(--muted);margin-top:4px">${subtitle}</div>`:''}
+      </div>
+      ${groups.map(g=>`
+        <div class="rec-group">
+          <div class="rec-group-title">
+            ${g.label||g.cat}
+            <span class="rec-group-disc">${g.disc}</span>
           </div>
-        </div>
+          <div style="overflow-x:auto">
+            <table class="rec-table">
+              <thead><tr>
+                <th>Event</th><th>Score</th><th>Athlete(s)</th>
+                <th>NOC</th><th>Competition / Location</th><th>Date</th>
+              </tr></thead>
+              <tbody>${recTableRows(g.items)}</tbody>
+            </table>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
 
-        <!-- Medal summary -->
-        <div class="stats-bar" style="margin:0 0 28px">
-          <div class="stat-card"><div class="stat-value" style="color:#F7DC6F">${gold.length}</div><div class="stat-label">🥇 Gold</div></div>
-          <div class="stat-card"><div class="stat-value" style="color:#BDC3C7">${silver.length}</div><div class="stat-label">🥈 Silber</div></div>
-          <div class="stat-card"><div class="stat-value" style="color:#E67E22">${bronze.length}</div><div class="stat-label">🥉 Bronze</div></div>
-          <div class="stat-card"><div class="stat-value">${athletes.length}</div><div class="stat-label">Athleten</div></div>
-        </div>
+// ── Sub-nav toggle ──
+let recordMode = 'world';
+function switchRecordMode(mode, btn){
+  recordMode = mode;
+  document.querySelectorAll('.rec-subnav').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('wr-controls').style.display  = mode==='world'    ? 'flex' : 'none';
+  document.getElementById('nr-controls').style.display  = mode==='national' ? 'flex' : 'none';
+  document.getElementById('recordsArea').innerHTML = '';
+}
 
-        <!-- Athlete medal table -->
-        ${athletes.length?`
-        <div class="section-header" style="margin-bottom:14px">
-          <h2 class="section-title">Athleten nach Medaillen</h2>
-          <div class="section-line"></div>
-        </div>
-        <div style="overflow-x:auto;margin-bottom:28px">
-          <table class="medal-table">
-            <thead>
-              <tr>
-                <th>Athlet</th>
-                <th class="center">🥇</th>
-                <th class="center">🥈</th>
-                <th class="center">🥉</th>
-                <th class="center">Top-3 ges.</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${athletes.filter(a=>a.gold+a.silver+a.bronze>0).slice(0,20).map((a,i)=>`
-                <tr>
-                  <td><span class="rnk-badge">${i+1}</span> &nbsp;${a.name}</td>
-                  <td class="center medal-gold">${a.gold||'—'}</td>
-                  <td class="center medal-silver">${a.silver||'—'}</td>
-                  <td class="center medal-bronze">${a.bronze||'—'}</td>
-                  <td class="center" style="color:var(--muted)">${a.gold+a.silver+a.bronze}</td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>`:''}
-
-        <!-- Best results list -->
-        ${bestResults.length?`
-        <div class="section-header" style="margin-bottom:14px">
-          <h2 class="section-title">Beste Einzelresultate (Top 10)</h2>
-          <div class="section-line"></div>
-        </div>
-        <div class="results-list">
-          ${bestResults.map(r=>`
-            <div class="result-item">
-              <div class="result-rank ${medalRankCls(r.Rnk)}">${r.Rnk}</div>
-              <div class="result-info">
-                <div class="result-name">${r.GName||''} ${r.FName||''}</div>
-                <div class="result-meta">${r.Name||r.NameShort||'—'} · ${formatDate(r.DFrom)} · ${r.Country||''}</div>
-                <div class="result-meta">${r.ComLevelDescr||''}</div>
-              </div>
-              <span class="result-cat">${r.Cat||''}</span>
-            </div>`).join('')}
-        </div>`:''}
-
-        ${!items.length?`<div class="state-box"><p>Keine Ergebnisse gefunden für ${noc} im gewählten Zeitraum.</p></div>`:''}
-      </div>`;
+// ── World Records ──
+async function fetchWorldRecords(){
+  const level  = document.getElementById('wrLevel').value;
+  const catCode= document.getElementById('wrCat').value;
+  const area   = document.getElementById('recordsArea');
+  area.innerHTML=`<div class="records-section"><div class="state-box"><div class="spinner"></div><p>Loading records …</p></div></div>`;
+  try{
+    const p = new URLSearchParams();
+    p.set('RecordLevelId', level);
+    if(catCode) p.set('CatCode', catCode);
+    p.set('RBP','All');
+    const res = await fetch(`${BASE_REC}?${p.toString()}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = data.items||[];
+    const groups = groupRecords(items);
+    const levelLabel = REC_LEVEL_LABELS[level]||`Level ${level}`;
+    area.innerHTML = renderRecordTable(groups, levelLabel+'s', `${items.length} records across all disciplines`);
   }catch(e){
-    area.innerHTML=`<div class="section"><div class="state-box"><p>Fehler: ${e.message}</p></div></div>`;
+    area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
 }
 
-function clearCountryView(){
-  document.getElementById('countryResultsArea').innerHTML='';
-  document.getElementById('countryNocInput').value='';
-  document.querySelectorAll('.country-item').forEach(c=>c.classList.remove('selected'));
+// ── National Records ──
+function quickNoc(noc){
+  document.getElementById('nrNoc').value=noc;
+  fetchNationalRecords();
+}
+
+async function fetchNationalRecords(){
+  const noc    = document.getElementById('nrNoc').value.trim().toUpperCase();
+  const catCode= document.getElementById('nrCat').value;
+  if(!noc){ alert('Please enter a NOC code (e.g. GER)'); return; }
+  const area = document.getElementById('recordsArea');
+  area.innerHTML=`<div class="records-section"><div class="state-box"><div class="spinner"></div><p>Loading national records for ${noc} …</p></div></div>`;
+  try{
+    const p = new URLSearchParams();
+    p.set('NOC', noc);           // national record level filter
+    p.set('RecordLevelId', '4'); // Level 4 = National Record in WA system
+    if(catCode) p.set('CatCode', catCode);
+    p.set('RBP','All');
+    const res = await fetch(`${BASE_REC}?${p.toString()}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = data.items||[];
+
+    // Also try fetching with Noc param if NOC returns nothing
+    if(!items.length){
+      const p2 = new URLSearchParams();
+      p2.set('Noc', noc);
+      p2.set('RecordLevelId','4');
+      if(catCode) p2.set('CatCode', catCode);
+      p2.set('RBP','All');
+      const res2 = await fetch(`${BASE_REC}?${p2.toString()}`);
+      if(res2.ok){
+        const data2 = await res2.json();
+        const items2 = data2.items||[];
+        if(items2.length){
+          const groups2 = groupRecords(items2);
+          area.innerHTML = renderRecordTable(groups2, `National Records — ${noc}`, `${items2.length} records`);
+          return;
+        }
+      }
+    }
+
+    if(!items.length){
+      area.innerHTML=`<div class="records-section"><div class="state-box"><p>No national records found for <strong>${noc}</strong>.<br><span style="font-size:12px">This may mean no national records are registered in the World Archery system for this country, or the NOC code is incorrect.</span></p></div></div>`;
+      return;
+    }
+    const groups = groupRecords(items);
+    area.innerHTML = renderRecordTable(groups, `National Records — ${noc}`, `${items.length} records`);
+  }catch(e){
+    area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
+  }
 }
 
 // ═══════════════════════════════════ PAGINATION ═══════════════════════════════
@@ -1103,12 +1173,12 @@ function renderPagination(prefix, total, page, rbp, fetchFn){
   const pages=Math.ceil(total/rbp);
   const pag=document.getElementById(`${prefix}Pagination`);
   if(pages<=1){pag.innerHTML='';return;}
-  let html=`<button class="page-btn" onclick="fetchFns['${prefix}'](${page-1})" ${page<=1?'disabled':''}>← Zurück</button>`;
+  let html=`<button class="page-btn" onclick="fetchFns['${prefix}'](${page-1})" ${page<=1?'disabled':''}>← Back</button>`;
   const s=Math.max(1,page-2), e=Math.min(pages,page+2);
   if(s>1) html+=`<button class="page-btn" onclick="fetchFns['${prefix}'](1)">1</button>${s>2?'<span class="page-info">…</span>':''}`;
   for(let i=s;i<=e;i++) html+=`<button class="page-btn ${i===page?'active':''}" onclick="fetchFns['${prefix}'](${i})">${i}</button>`;
   if(e<pages) html+=`${e<pages-1?'<span class="page-info">…</span>':''}<button class="page-btn" onclick="fetchFns['${prefix}'](${pages})">${pages}</button>`;
-  html+=`<button class="page-btn" onclick="fetchFns['${prefix}'](${page+1})" ${page>=pages?'disabled':''}>Weiter →</button>`;
+  html+=`<button class="page-btn" onclick="fetchFns['${prefix}'](${page+1})" ${page>=pages?'disabled':''}>Next →</button>`;
   pag.innerHTML=html;
 }
 const fetchFns={comp:fetchCompetitions, athlete:fetchAthletes};
