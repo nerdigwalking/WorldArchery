@@ -510,6 +510,11 @@
       <input type="date" id="compEnd"/>
     </div>
     <div class="control-group">
+      <label>Country (NOC)</label>
+      <input type="text" id="compCountry" placeholder="e.g. GER" maxlength="3"
+             style="text-transform:uppercase;max-width:100px"/>
+    </div>
+    <div class="control-group">
       <label>WRE</label>
       <select id="compWRE">
         <option value="0">All</option>
@@ -668,6 +673,7 @@ const BASE_COMP  = 'https://api.worldarchery.org/v3/COMPETITIONS/';
 const BASE_RANK  = 'https://api.worldarchery.org/v3/WORLDRANKINGS/';
 const BASE_ARES  = 'https://api.worldarchery.org/v3/ATHLETERESULTS/';
 const BASE_CRES  = 'https://api.worldarchery.org/v3/COUNTRYRESULTS/';
+const BASE_REC   = 'https://api.worldarchery.org/v3/RECORDS/';
 const PHOTO_BASE = 'https://extranet.worldarchery.org/ProfilePictures/?Id=';
 
 function formatDate(d){
@@ -730,20 +736,21 @@ let compTab='all', compPage=1, compTotal=0;
 const COMP_RBP=12;
 
 const now=new Date();
-document.getElementById('compStart').value=`${now.getFullYear()}-01-01`;
+const todayStr=now.toISOString().slice(0,10);
+document.getElementById('compStart').value=todayStr;
 document.getElementById('compEnd').value  =`${now.getFullYear()}-12-31`;
-document.getElementById('countryStart').value=`${now.getFullYear()-5}-01-01`;
-document.getElementById('countryEnd').value  =`${now.getFullYear()}-12-31`;
 
 function buildCompParams(page){
   const p=new URLSearchParams();
   const search=document.getElementById('compSearch').value.trim();
   const sd=document.getElementById('compStart').value;
   const ed=document.getElementById('compEnd').value;
+  const country=document.getElementById('compCountry').value.trim().toUpperCase();
   const wre=document.getElementById('compWRE').value;
   if(search) p.set('fText',search);
   if(sd) p.set('StartDate',sd);
   if(ed) p.set('EndDate',ed);
+  if(country) p.set('Country',country);
   if(wre!=='0') p.set('WorldRankingEvent',wre);
   p.set('Cancelled','-1');
   p.set('SortBy','DATE');
@@ -863,6 +870,7 @@ function setCompTab(tab,el){
 }
 
 document.getElementById('compSearch').addEventListener('keydown',e=>{if(e.key==='Enter') fetchCompetitions(1)});
+document.getElementById('compCountry').addEventListener('keydown',e=>{if(e.key==='Enter') fetchCompetitions(1)});
 
 // ═══════════════════════════════════ ATHLETES ═══════════════════════════════
 let athletePage=1, athleteTotal=0;
@@ -1005,7 +1013,6 @@ async function openAthletePanel(id, name, noc){
 document.getElementById('athleteSearch').addEventListener('keydown',e=>{if(e.key==='Enter') fetchAthletes(1)});
 
 // ═══════════════════════════════════ RECORDS ═══════════════════════════════════
-const BASE_REC = 'https://api.worldarchery.org/v3/RECORDS/';
 
 // Map record level IDs to display labels
 const REC_LEVEL_LABELS = {1:'World Record',2:'Olympic Record',3:'World Cup Record',5:'World Championships Record'};
