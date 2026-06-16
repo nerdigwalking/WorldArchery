@@ -267,6 +267,19 @@
     .ranking-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px}
     .ranking-pts{font-size:12px;color:var(--muted);margin-top:2px}
 
+    /* ── BIO / CAREER STATS ── */
+    .bio-stats-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+      gap:8px;margin-top:8px;
+    }
+    .bio-stat{
+      background:var(--night-mid);border:1px solid var(--border);border-radius:8px;
+      padding:12px;text-align:center;
+    }
+    .bio-stat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);line-height:1}
+    .bio-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+    .bio-stat-sub{font-size:11px;color:var(--muted);margin-top:2px;opacity:.8}
+
     /* ── POINTS BY EVENT ── */
     .pts-list{display:flex;flex-direction:column;gap:4px}
     .pts-row{
@@ -428,6 +441,11 @@
       color:var(--muted);background:var(--night-mid);
       padding:2px 9px;border-radius:20px;border:1px solid var(--border);
     }
+    .rec-para-tag{
+      font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:#68D391;background:rgba(45,122,79,.15);border:1px solid rgba(45,122,79,.3);
+      padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;
+    }
     .rec-group{margin-bottom:36px}
     .rec-group-title{
       font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;
@@ -468,62 +486,17 @@
 
 <!-- NAVIGATION -->
 <nav>
-  <div class="nav-brand">WORLD <span>ARCHERY</span></div>
-  <button class="nav-tab active" onclick="showPage('competitions',this)">Competitions</button>
-  <button class="nav-tab" onclick="showPage('athletes',this)">Athletes</button>
+  <div class="nav-brand">WORLD ARCHERY <span>DATA</span></div>
+  <button class="nav-tab active" onclick="showPage('athletes',this)">Athletes</button>
+  <button class="nav-tab" onclick="showPage('competitions',this)">Competitions</button>
   <button class="nav-tab" onclick="showPage('countries',this)">Records</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════════ PAGE: COMPETITIONS ═══ -->
-<div class="page active" id="page-competitions">
-
-  <!-- HERO -->
-  <header class="hero">
-    <div class="hero-text">
-      <p class="hero-eyebrow">🏹 World Archery</p>
-      <h1 class="hero-title">WORLD<br><span>ARCHERY</span><br>DATA</h1>
-      <p class="hero-sub">Competitions, athletes and world ranking data in real time from the official World Archery API.</p>
-    </div>
-    <!-- CORRECT WA TARGET: White(1-2), Black(3-4), Blue(5-6), Red(7-8), Yellow(9-10) -->
-    <div class="target-wrap">
-      <svg class="target-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-        <!-- White rings 1-2 -->
-        <circle cx="120" cy="120" r="118" fill="#FFFFFF"/>
-        <!-- Separator line between 1 & 2 -->
-        <circle cx="120" cy="120" r="106" fill="none" stroke="#CCCCCC" stroke-width="0.8"/>
-        <!-- Black rings 3-4 -->
-        <circle cx="120" cy="120" r="94" fill="#1A1A1A"/>
-        <circle cx="120" cy="120" r="82" fill="none" stroke="#333333" stroke-width="0.8"/>
-        <!-- Blue rings 5-6 -->
-        <circle cx="120" cy="120" r="70" fill="#006CB7"/>
-        <circle cx="120" cy="120" r="58" fill="none" stroke="#0059A0" stroke-width="0.8"/>
-        <!-- Red rings 7-8 -->
-        <circle cx="120" cy="120" r="46" fill="#EE1C25"/>
-        <circle cx="120" cy="120" r="34" fill="none" stroke="#CC1020" stroke-width="0.8"/>
-        <!-- Yellow (gold) rings 9-10 -->
-        <circle cx="120" cy="120" r="22" fill="#F7E63A"/>
-        <!-- X ring (inner 10) -->
-        <circle cx="120" cy="120" r="11" fill="#F7E63A" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/>
-        <!-- Cross hair -->
-        <line x1="120" y1="113" x2="120" y2="127" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
-        <line x1="113" y1="120" x2="127" y2="120" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
-
-        <!-- Thin border -->
-        <circle cx="120" cy="120" r="118" fill="none" stroke="rgba(200,151,58,0.3)" stroke-width="1"/>
-      </svg>
-      <!-- Arrow -->
-      <svg class="arrow-hit" width="16" height="80" viewBox="0 0 16 80">
-        <rect x="7" y="12" width="2" height="60" fill="#C8973A" rx="1"/>
-        <polygon points="8,0 3,15 13,15" fill="#E5B04A"/>
-        <rect x="5" y="68" width="6" height="3" fill="#8B7355" rx="1"/>
-        <line x1="6" y1="72" x2="4" y2="80" stroke="#8B7355" stroke-width="1.5"/>
-        <line x1="10" y1="72" x2="12" y2="80" stroke="#8B7355" stroke-width="1.5"/>
-      </svg>
-    </div>
-  </header>
+<div class="page" id="page-competitions">
 
   <!-- STATS BAR -->
-  <div class="stats-bar">
+  <div class="stats-bar" style="margin-top:32px">
     <div class="stat-card"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total competitions</div></div>
     <div class="stat-card"><div class="stat-value" id="statLive" style="color:var(--red)">—</div><div class="stat-label">Live now</div></div>
     <div class="stat-card"><div class="stat-value" id="statUpcoming">—</div><div class="stat-label">Upcoming</div></div>
@@ -578,7 +551,40 @@
 </div><!-- /page-competitions -->
 
 <!-- ═══════════════════════════════════════════════ PAGE: ATHLETES ═══ -->
-<div class="page" id="page-athletes">
+<div class="page active" id="page-athletes">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-text">
+      <h1 class="hero-title">WORLD<br><span>ARCHERY</span><br>DATA</h1>
+      <p class="hero-sub">World rankings, athlete profiles, competitions and records — pulled live from the World Archery API.</p>
+    </div>
+    <!-- WA TARGET: White(1-2), Black(3-4), Blue(5-6), Red(7-8), Yellow(9-10) -->
+    <div class="target-wrap">
+      <svg class="target-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="120" cy="120" r="118" fill="#FFFFFF"/>
+        <circle cx="120" cy="120" r="106" fill="none" stroke="#CCCCCC" stroke-width="0.8"/>
+        <circle cx="120" cy="120" r="94" fill="#1A1A1A"/>
+        <circle cx="120" cy="120" r="82" fill="none" stroke="#333333" stroke-width="0.8"/>
+        <circle cx="120" cy="120" r="70" fill="#006CB7"/>
+        <circle cx="120" cy="120" r="58" fill="none" stroke="#0059A0" stroke-width="0.8"/>
+        <circle cx="120" cy="120" r="46" fill="#EE1C25"/>
+        <circle cx="120" cy="120" r="34" fill="none" stroke="#CC1020" stroke-width="0.8"/>
+        <circle cx="120" cy="120" r="22" fill="#F7E63A"/>
+        <circle cx="120" cy="120" r="11" fill="#F7E63A" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/>
+        <line x1="120" y1="113" x2="120" y2="127" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+        <line x1="113" y1="120" x2="127" y2="120" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+        <circle cx="120" cy="120" r="118" fill="none" stroke="rgba(200,151,58,0.3)" stroke-width="1"/>
+      </svg>
+      <svg class="arrow-hit" width="16" height="80" viewBox="0 0 16 80">
+        <rect x="7" y="12" width="2" height="60" fill="#C8973A" rx="1"/>
+        <polygon points="8,0 3,15 13,15" fill="#E5B04A"/>
+        <rect x="5" y="68" width="6" height="3" fill="#8B7355" rx="1"/>
+        <line x1="6" y1="72" x2="4" y2="80" stroke="#8B7355" stroke-width="1.5"/>
+        <line x1="10" y1="72" x2="12" y2="80" stroke="#8B7355" stroke-width="1.5"/>
+      </svg>
+    </div>
+  </header>
 
   <div class="controls" style="padding-top:32px">
     <div class="control-group">
@@ -651,15 +657,23 @@
     <div class="control-group">
       <label>Category</label>
       <select id="wrCat">
-        <option value="">All</option>
-        <option value="RM">Recurve Men</option>
-        <option value="RW">Recurve Women</option>
-        <option value="CM">Compound Men</option>
-        <option value="CW">Compound Women</option>
-        <option value="RM10">Recurve Men Indoor</option>
-        <option value="RW10">Recurve Women Indoor</option>
-        <option value="CM10">Compound Men Indoor</option>
-        <option value="CW10">Compound Women Indoor</option>
+        <option value="">All categories</option>
+        <optgroup label="Recurve">
+          <option value="RM">Recurve Men</option>
+          <option value="RW">Recurve Women</option>
+          <option value="RMX">Recurve Mixed Team</option>
+        </optgroup>
+        <optgroup label="Compound">
+          <option value="CM">Compound Men</option>
+          <option value="CW">Compound Women</option>
+          <option value="CMX">Compound Mixed Team</option>
+        </optgroup>
+        <optgroup label="Para">
+          <option value="PRM">Para Recurve Open Men</option>
+          <option value="PRW">Para Recurve Open Women</option>
+          <option value="PCM">Para Compound Open Men</option>
+          <option value="PCW">Para Compound Open Women</option>
+        </optgroup>
       </select>
     </div>
     <button class="btn" onclick="fetchWorldRecords()">Load</button>
@@ -674,15 +688,23 @@
     <div class="control-group">
       <label>Category</label>
       <select id="nrCat">
-        <option value="">All</option>
-        <option value="RM">Recurve Men</option>
-        <option value="RW">Recurve Women</option>
-        <option value="CM">Compound Men</option>
-        <option value="CW">Compound Women</option>
-        <option value="RM10">Recurve Men Indoor</option>
-        <option value="RW10">Recurve Women Indoor</option>
-        <option value="CM10">Compound Men Indoor</option>
-        <option value="CW10">Compound Women Indoor</option>
+        <option value="">All categories</option>
+        <optgroup label="Recurve">
+          <option value="RM">Recurve Men</option>
+          <option value="RW">Recurve Women</option>
+          <option value="RMX">Recurve Mixed Team</option>
+        </optgroup>
+        <optgroup label="Compound">
+          <option value="CM">Compound Men</option>
+          <option value="CW">Compound Women</option>
+          <option value="CMX">Compound Mixed Team</option>
+        </optgroup>
+        <optgroup label="Para">
+          <option value="PRM">Para Recurve Open Men</option>
+          <option value="PRW">Para Recurve Open Women</option>
+          <option value="PCM">Para Compound Open Men</option>
+          <option value="PCW">Para Compound Open Women</option>
+        </optgroup>
       </select>
     </div>
     <button class="btn" onclick="fetchNationalRecords()">Load</button>
@@ -830,8 +852,10 @@ function showPage(id,btn){
   if(id==='countries' && !document.getElementById('recordsArea').innerHTML.trim()){
     fetchWorldRecords();
   }
+  if(id==='competitions' && !compLoaded){ compLoaded=true; fetchCompetitions(1); }
   closePanel();
 }
+let compLoaded=false;
 
 // ═══════════════════════════════════ PANEL ═══════════════════════════════════
 function openPanel(){
@@ -1160,18 +1184,48 @@ async function openAthletePanel(id, name, noc){
   const pc=document.getElementById('panelContent');
   pc.innerHTML=`<div style="padding-top:40px" class="state-box"><div class="spinner"></div><p>Loading athlete data …</p></div>`;
   try{
-    const cat=document.getElementById('athleteCat').value;
-    // Load detailed ranking (incl. per-event points breakdown) + recent results in parallel
-    const [rankRes, resultsRes] = await Promise.all([
+    // Load biography (rich career stats), detailed rankings, and recent results in parallel
+    const [bioRes, rankRes, resultsRes] = await Promise.all([
+      fetch(`https://api.worldarchery.org/v3/ATHLETEBIOGRAPHY/?Id=${id}&Detailed=true`),
       fetch(`https://api.worldarchery.org/v3/WORLDRANKINGS/?Id=${id}&SortBy=RANKING&Detailed=true&RBP=20`),
-      fetch(`https://api.worldarchery.org/v3/ATHLETERESULTS/?Id=${id}&SortBy=-DATE&RBP=12`)
+      fetch(`https://api.worldarchery.org/v3/ATHLETERESULTS/?Id=${id}&SortBy=-DATE&RBP=15`)
     ]);
-    const rankData   = rankRes.ok   ? await rankRes.json()    : {items:[]};
-    const resultsData= resultsRes.ok ? await resultsRes.json() : {items:[]};
+    const bio     = bioRes.ok     ? (await bioRes.json()).items?.[0]||{} : {};
+    const rankData= rankRes.ok    ? await rankRes.json()    : {items:[]};
+    const resData = resultsRes.ok ? await resultsRes.json() : {items:[]};
     const ranks  = rankData.items||[];
-    const results= resultsData.items||[];
+    const results= resData.items||[];
+
+    // ── Career stats (from biography) ──
+    const careerArr = bio.Stats?.Career || [];
+    const career = careerArr[0] || {};
+    const bestArr = bio.WorldRankings?.Best || [];
+    const best = bestArr[0] || {};
+
+    // ── Derived result stats from recent results ──
+    const ranked = results.filter(r=>typeof (r.Rnk)==='number');
+    const golds  = ranked.filter(r=>r.Rnk===1).length;
+    const podiums= ranked.filter(r=>r.Rnk<=3).length;
+    const bestQ  = results.reduce((m,r)=>{const q=r.QuScore; return (typeof q==='number'&&q>m)?q:m;},0);
 
     const ini=id.slice(0,2).toUpperCase();
+    const countryName = bio.CountryName || '';
+    const birth = bio.DBirth || bio.BirthDate || bio.DateOfBirth;
+    const age = birth ? Math.floor((Date.now()-new Date(birth))/(365.25*24*3600*1000)) : null;
+
+    // Helper to build a stat tile only if a value exists
+    const tile=(val,lbl,sub)=> (val!==undefined&&val!==null&&val!==''&&val!=='—')
+      ? `<div class="bio-stat"><div class="bio-stat-val">${val}</div><div class="bio-stat-lbl">${lbl}</div>${sub?`<div class="bio-stat-sub">${sub}</div>`:''}</div>` : '';
+
+    const careerTiles = [
+      tile(career.MatchTot, 'Matches'),
+      career.MatchWinPercentage!==undefined ? tile(Math.round(career.MatchWinPercentage)+'%','Match win %',`${career.MatchWin||0} / ${career.MatchTot||0}`) : '',
+      tile(career.QBest, 'Best qualification'),
+      career.AverageArr!==undefined ? tile(Number(career.AverageArr).toFixed(2),'Avg per arrow') : '',
+      career.AverageArrMatches!==undefined ? tile(Number(career.AverageArrMatches).toFixed(2),'Avg / arrow (matches)') : '',
+      career.TBTot!==undefined ? tile((career.TBWinPercentage!==undefined?Math.round(career.TBWinPercentage)+'%':career.TBWin),'Shoot-off win %',`${career.TBWin||0} / ${career.TBTot||0}`) : '',
+    ].filter(Boolean).join('');
+
     pc.innerHTML=`
       <div class="panel-athlete-header">
         <div class="panel-avatar-lg">
@@ -1179,11 +1233,15 @@ async function openAthletePanel(id, name, noc){
         </div>
         <div>
           <div class="panel-name">${name}</div>
-          <div class="panel-noc">${noc} · WA-ID: ${id}</div>
+          <div class="panel-noc">${noc}${countryName?` · ${countryName}`:''}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">
+            WA-ID ${id}${age?` · Age ${age}`:''}${bio.Hand?` · ${bio.Hand}-handed`:''}
+          </div>
         </div>
       </div>
+
       ${ranks.length?`
-      <div class="panel-section-title">World Ranking Positions</div>
+      <div class="panel-section-title">Current World Ranking</div>
       <div class="ranking-grid">
         ${ranks.map(r=>`
           <div class="ranking-item">
@@ -1191,9 +1249,31 @@ async function openAthletePanel(id, name, noc){
             <div class="ranking-lbl">${r.Cat}</div>
             <div class="ranking-pts">${r.Points} pts</div>
           </div>`).join('')}
-      </div>
+      </div>`:''}
+
+      ${best.Rnk!==undefined?`
+      <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)">
+        <span style="color:var(--gold);font-weight:700">Career-best rank: #${best.Rnk}</span>
+        ${best.CatCode?`<span class="cat-pill">${best.CatCode}</span>`:''}
+        ${best.RnkDtIssued?`<span style="font-size:11px">(${formatDate(best.RnkDtIssued)})</span>`:''}
+      </div>`:''}
+
+      ${careerTiles?`
+      <div class="panel-divider"></div>
+      <div class="panel-section-title">Career Statistics</div>
+      <div class="bio-stats-grid">${careerTiles}</div>`:''}
+
+      ${(podiums||bestQ)?`
+      <div class="panel-divider"></div>
+      <div class="panel-section-title">Recent Form (last ${results.length} events)</div>
+      <div class="bio-stats-grid">
+        ${tile(golds,'Wins (recent)')}
+        ${tile(podiums,'Podiums (recent)')}
+        ${bestQ?tile(bestQ,'Best qualification (recent)'):''}
+      </div>`:''}
+
       ${renderPointsBreakdown(ranks)}
-      `:''}
+
       ${results.length?`
       <div class="panel-divider"></div>
       <div class="panel-section-title">Recent Results</div>
@@ -1231,18 +1311,29 @@ document.getElementById('athleteSearch').addEventListener('keydown',e=>{if(e.key
 
 // ═══════════════════════════════════ RECORDS ═══════════════════════════════════
 
-// Record level codes used by the WA system (best-effort; verified by trying alternatives)
-const REC_LEVEL_LABELS = {1:'World Record',2:'Olympic Record',3:'World Cup Record',5:'World Championships Record'};
+// Record level codes (from RecordLevelId in the API)
+const REC_LEVEL_LABELS = {1:'World Record',2:'Continental Record',3:'World Cup Record',4:'National Record',5:'World Championships Record'};
 
+// Category codes → readable labels. Para categories are prefixed P / use W&H / VI etc.
 const CAT_LABELS = {
   RM:'Recurve Men',RW:'Recurve Women',CM:'Compound Men',CW:'Compound Women',
-  RM10:'Recurve Men Indoor',RW10:'Recurve Women Indoor',
-  CM10:'Compound Men Indoor',CW10:'Compound Women Indoor',
+  RMX:'Recurve Mixed Team',CMX:'Compound Mixed Team',
+  RU21M:'Recurve U21 Men',RU21W:'Recurve U21 Women',
+  CU21M:'Compound U21 Men',CU21W:'Compound U21 Women',
+  RU18M:'Recurve U18 Men',RU18W:'Recurve U18 Women',
+  CU18M:'Compound U18 Men',CU18W:'Compound U18 Women',
   BM:'Barebow Men',BW:'Barebow Women',
+  PCM:'Para Compound Open Men',PCW:'Para Compound Open Women',
+  PRM:'Para Recurve Open Men',PRW:'Para Recurve Open Women',
+  PCMX:'Para Compound Mixed Team',PRMX:'Para Recurve Mixed Team',
 };
 function catLabel(c){return CAT_LABELS[c]||c||'—';}
 
-// Flexible field getter — checks several possible key spellings
+// Discipline IDs (RecordDiscipline) → label. 1=Outdoor/Target is the common case.
+const DISC_LABELS = {1:'Outdoor Target',2:'Indoor',3:'Field',4:'Para',5:'Run Archery',6:'3D'};
+function discLabel(id){ return DISC_LABELS[id] || (id!=null?`Discipline ${id}`:'Records'); }
+
+// Flexible field getter
 function pick(obj, ...keys){
   for(const k of keys){
     if(obj && obj[k]!==undefined && obj[k]!==null && obj[k]!=='') return obj[k];
@@ -1250,8 +1341,50 @@ function pick(obj, ...keys){
   return undefined;
 }
 
-function recDisc(r){ return resolveText(r.DisDescr)||resolveText(r.Discipline)||resolveText(r.Dis)||resolveText(r.DisciplineDescr)||resolveText(r.EventType)||'Records'; }
-function recCat(r){ return resolveText(r.CatCode)||resolveText(r.Cat)||resolveText(r.Category)||resolveText(r.CategoryCode)||''; }
+// ── Field extractors keyed to the REAL World Archery RECORDS schema ──
+function recCat(r){ return r.Cat || ''; }
+function recDisc(r){ return discLabel(r.RecordDiscipline); }
+function recIsTeam(r){ return r.IsTeam === true; }
+
+// Athletes live under "Archers" — a single object for individual records,
+// an array for team records.
+function fmtArcher(a){
+  if(!a) return '';
+  const fn = a.FName || '';
+  const gn = a.GName || '';
+  if(fn||gn) return (a.WNameOrd ? `${fn} ${gn}` : `${gn} ${fn}`).trim();
+  return (a.Name || '').trim();
+}
+function recHolders(r){
+  const ar = r.Archers;
+  if(Array.isArray(ar)) return ar.map(fmtArcher).filter(Boolean).join(' / ') || '—';
+  if(ar && typeof ar==='object') return fmtArcher(ar) || '—';
+  return '—';
+}
+
+function recNoc(r){ return r.NOC || ''; }
+
+// Event label: "50 metres Round · 72 arrows"
+function recEvent(r){
+  const main = r.RecordName || '';
+  const sub  = r.RecordSubName || '';
+  return [main, sub].filter(Boolean).join(' · ') || '—';
+}
+
+function recScore(r){
+  const pts = (r.Points!==undefined && r.Points!==null) ? r.Points : '—';
+  return pts;
+}
+
+function recCompetition(r){
+  const c = r.Competition;
+  if(c && typeof c==='object'){
+    const name = c.Name || '';
+    const loc  = [c.Place, c.Country].filter(Boolean).join(', ');
+    return [name, loc].filter(Boolean).join(' · ') || '—';
+  }
+  return '—';
+}
 
 function groupRecords(items){
   const groups={};
@@ -1262,98 +1395,28 @@ function groupRecords(items){
     if(!groups[key]) groups[key]={disc,cat,label:catLabel(cat),items:[]};
     groups[key].items.push(r);
   });
-  return Object.values(groups).sort((a,b)=>String(a.disc).localeCompare(b.disc)||String(a.cat).localeCompare(b.cat));
-}
-
-function fmtAthlete(a){
-  if(!a) return '';
-  const fn = pick(a,'FName','FamilyName','LastName')||'';
-  const gn = pick(a,'GName','GivenName','FirstName')||'';
-  if(fn||gn) return (a.WNameOrd ? `${fn} ${gn}` : `${gn} ${fn}`).trim();
-  return (pick(a,'Name','FullName')||'').trim();
-}
-
-function recHolders(r){
-  // Array of athletes (team records)
-  const arr = r.Athletes || r.Members || r.Holders || r.Team;
-  if(Array.isArray(arr) && arr.length){
-    const names = arr.map(fmtAthlete).filter(Boolean);
-    if(names.length) return names.join(' / ');
-  }
-  // Single nested Athlete object (confirmed WA structure across all endpoints)
-  const single = r.Athlete || r.athlete;
-  if(single && typeof single==='object'){
-    const nm = fmtAthlete(single);
-    if(nm) return nm;
-  }
-  // Inline fields on the record itself
-  const fn = pick(r,'FName','FamilyName','AthleteFName');
-  const gn = pick(r,'GName','GivenName','AthleteGName');
-  if(fn||gn) return `${gn||''} ${fn||''}`.trim();
-  return pick(r,'AthleteName','Name','Holder')||'—';
-}
-
-function recNoc(r){
-  // Direct NOC field on the record
-  const direct = pick(r,'NOC','Noc','CountryCode');
-  if(direct) return direct;
-  // Nested single athlete
-  if(r.Athlete && typeof r.Athlete==='object'){
-    const n = pick(r.Athlete,'NOC','Noc'); if(n) return n;
-  }
-  // First athlete of a team
-  const arr = r.Athletes || r.Members || r.Team;
-  if(Array.isArray(arr) && arr[0]){
-    const n = pick(arr[0],'NOC','Noc'); if(n) return n;
-  }
-  return pick(r,'Country')||'';
-}
-
-function recIsTeam(r){
-  if(r.IsTeam===true) return true;
-  if(Array.isArray(r.Athletes) && r.Athletes.length>1) return true;
-  if(Array.isArray(r.Members) && r.Members.length>1) return true;
-  const cat = String(recCat(r));
-  const ev  = String(recEvent(r));
-  // Heuristic: team events usually mention "Team" or category ends with X (e.g. RMX = mixed team)
-  return /team/i.test(cat) || /team/i.test(ev) || /X$/.test(cat);
-}
-
-// Resolve a value that might be a string or a nested object with a descriptive sub-field
-function resolveText(v){
-  if(v===undefined||v===null) return undefined;
-  if(typeof v==='string'||typeof v==='number') return v;
-  if(typeof v==='object') return pick(v,'Descr','Name','Description','Label','Text','Value','Code');
-  return undefined;
-}
-
-function recEvent(r){
-  const candidates = ['EventDescr','Event','EventName','RecordType','RecordTypeDescr',
-                      'TypeDescr','Type','Distance','DistanceDescr','RoundName','Round','Description'];
-  for(const k of candidates){
-    const t = resolveText(r[k]);
-    if(t) return t;
-  }
-  return '—';
+  // Sort: by category label, records within a group by score descending
+  Object.values(groups).forEach(g=>g.items.sort((a,b)=>(b.Points||0)-(a.Points||0)));
+  return Object.values(groups).sort((a,b)=>String(a.label).localeCompare(b.label));
 }
 
 function recTableRows(items){
   return items.map(r=>{
+    const event = recEvent(r);
+    const score = recScore(r);
+    const xs    = (r.Xs!==undefined && r.Xs>0) ? ` <span style="font-size:10px;color:var(--muted)">(${r.Xs}X)</span>` : '';
     const holders = recHolders(r);
     const noc   = recNoc(r);
-    const event = recEvent(r);
-    const score = pick(r,'Score','Pts','Points','Value','Result','Record') ?? '—';
-    const placeRaw = resolveText(r.Place)||resolveText(r.Location)||resolveText(r.City);
-    const cName = resolveText(r.CompName)||resolveText(r.Competition)||resolveText(r.TournamentName)||resolveText(r.CompetitionName)||resolveText(r.Event);
-    const place = [cName, placeRaw].filter(Boolean).join(' · ') || '—';
-    const dRaw  = pick(r,'Date','DFrom','RecordDate','DateSet','DateShot');
-    const date  = dRaw ? formatDate(dRaw) : '—';
+    const comp  = recCompetition(r);
+    const date  = r.Date ? formatDate(r.Date) : '—';
+    const standing = r.RecordStanding ? '' : ` <span style="font-size:10px;color:#FC8181" title="superseded">⚠</span>`;
+    const para = r.ParaAr ? ` <span class="rec-para-tag">Para</span>` : '';
     return `<tr>
-      <td class="event-cell">${event}</td>
-      <td class="score-cell">${score}</td>
-      <td>${holders}</td>
+      <td class="event-cell">${event}${para}</td>
+      <td class="score-cell">${score}${xs}</td>
+      <td>${holders}${standing}</td>
       <td class="meta-cell">${noc}</td>
-      <td class="meta-cell">${place}</td>
+      <td class="meta-cell">${comp}</td>
       <td class="date-cell">${date}</td>
     </tr>`;
   }).join('');
@@ -1364,13 +1427,13 @@ function renderRecordGroups(groups){
     <div class="rec-group">
       <div class="rec-group-title">
         ${g.label||g.cat||'Records'}
-        ${g.disc?`<span class="rec-group-disc">${g.disc}</span>`:''}
+        ${g.cat&&g.cat!==g.label?`<span class="rec-group-disc">${g.cat}</span>`:''}
       </div>
       <div style="overflow-x:auto">
         <table class="rec-table">
           <thead><tr>
             <th>Event</th><th>Score</th><th>Athlete(s)</th>
-            <th>NOC</th><th>Competition / Location</th><th>Date</th>
+            <th>NOC</th><th>Competition</th><th>Date</th>
           </tr></thead>
           <tbody>${recTableRows(g.items)}</tbody>
         </table>
@@ -1380,12 +1443,10 @@ function renderRecordGroups(groups){
 
 function renderRecordTable(items, title, subtitle){
   if(!items.length) return `<div class="state-box" style="padding:40px"><p>No records found.</p></div>`;
-  // Split individual vs team, then group each by discipline+category
   const indiv = items.filter(r=>!recIsTeam(r));
   const team  = items.filter(r=>recIsTeam(r));
   const indivGroups = groupRecords(indiv);
   const teamGroups  = groupRecords(team);
-  const sample = JSON.stringify(items[0]||{}, null, 2).slice(0,1500);
   return `
     <div class="records-section">
       <div style="margin-bottom:24px">
@@ -1398,44 +1459,7 @@ function renderRecordTable(items, title, subtitle){
       ${teamGroups.length?`
         <div class="rec-division-header" style="margin-top:32px"><span>👥 Team</span><span class="rec-division-count">${team.length}</span></div>
         ${renderRecordGroups(teamGroups)}`:''}
-      <details style="margin-top:28px">
-        <summary style="cursor:pointer;font-size:12px;color:var(--muted)">Show raw API field names (developer view)</summary>
-        <pre style="font-size:11px;background:var(--night-mid);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;overflow:auto;color:var(--muted);white-space:pre-wrap">${sample.replace(/</g,'&lt;')}</pre>
-      </details>
     </div>`;
-}
-
-function recDiagnostic(area, tried, lastData){
-  // Show what we tried and a sample of the raw response, so it's clear whether
-  // the API genuinely has no data or the field/param names differ.
-  const sample = lastData ? JSON.stringify(lastData, null, 2).slice(0, 1200) : '(no response body)';
-  area.innerHTML=`
-    <div class="records-section">
-      <div class="state-box" style="padding:32px;align-items:flex-start;text-align:left">
-        <p style="margin-bottom:10px">No records were returned by the World Archery API for this query.</p>
-        <p style="font-size:12px;margin-bottom:12px">Tried: ${tried.map(t=>`<code style="background:var(--night-mid);padding:1px 5px;border-radius:3px">${t}</code>`).join(', ')}</p>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:6px">Raw response sample (for diagnostics):</p>
-        <pre style="font-size:11px;background:var(--night-mid);border:1px solid var(--border);border-radius:8px;padding:12px;max-width:100%;overflow:auto;color:var(--muted);white-space:pre-wrap">${sample.replace(/</g,'&lt;')}</pre>
-      </div>
-    </div>`;
-}
-
-// Try a list of query-param variants, return {items, data, query} for the first non-empty
-async function tryRecordQueries(variants){
-  let lastData=null; const tried=[];
-  for(const v of variants){
-    const qs = new URLSearchParams(v).toString();
-    tried.push(qs);
-    try{
-      const res = await fetch(`${BASE_REC}?${qs}`);
-      if(!res.ok) continue;
-      const data = await res.json();
-      lastData = data;
-      const items = data.items||[];
-      if(items.length) return {items, data, query:qs, tried};
-    }catch(e){ /* keep trying */ }
-  }
-  return {items:[], data:lastData, query:null, tried};
 }
 
 // ── Sub-nav toggle ──
@@ -1457,23 +1481,20 @@ async function fetchWorldRecords(){
   const area   = document.getElementById('recordsArea');
   area.innerHTML=`<div class="records-section"><div class="state-box"><div class="spinner"></div><p>Loading records …</p></div></div>`;
 
-  // Try several parameter spellings the API might expect
-  const base = {RBP:'All'};
-  if(catCode) base.CatCode = catCode;
-  const variants = [
-    {...base, RecordLevelId: level},
-    {...base, RecordLevel: level},
-    {...base, LevelId: level},
-    {...base, Level: level},
-    {...base, RecordTypeId: level},
-    {...base}, // no level filter at all → see everything
-  ];
+  const params = {RecordLevelId: level, RBP:'All'};
+  if(catCode) params.Cat = catCode;
 
   try{
-    const {items, data, tried} = await tryRecordQueries(variants);
-    if(!items.length){ recDiagnostic(area, tried, data); return; }
-    const levelLabel = REC_LEVEL_LABELS[level]||`Records`;
-    area.innerHTML = renderRecordTable(items, levelLabel+'s', `${items.length} records`);
+    const res = await fetch(`${BASE_REC}?${new URLSearchParams(params).toString()}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = data.items||[];
+    if(!items.length){
+      area.innerHTML=`<div class="records-section"><div class="state-box" style="padding:40px"><p>No records found for this level/category.</p></div></div>`;
+      return;
+    }
+    const levelLabel = REC_LEVEL_LABELS[level]||'Records';
+    area.innerHTML = renderRecordTable(items, levelLabel+'s', `${items.length} ratified records`);
   }catch(e){
     area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
@@ -1483,38 +1504,35 @@ async function fetchWorldRecords(){
 async function fetchNationalRecords(){
   const noc    = document.getElementById('nrNoc').value.trim().toUpperCase();
   const catCode= document.getElementById('nrCat').value;
-  if(!noc){ alert('Please enter a NOC code (e.g. GER)'); return; }
+  if(!noc){ alert('Please select a country'); return; }
   const area = document.getElementById('recordsArea');
   area.innerHTML=`<div class="records-section"><div class="state-box"><div class="spinner"></div><p>Loading national records for ${noc} …</p></div></div>`;
 
-  const base = {RBP:'All'};
-  if(catCode) base.CatCode = catCode;
-  // National record level is commonly id 4; try with both NOC param spellings,
-  // with and without the level filter (some deployments key national records purely off NOC).
-  const variants = [
-    {...base, NOC: noc, RecordLevelId:'4'},
-    {...base, Noc: noc, RecordLevelId:'4'},
-    {...base, NOC: noc, RecordLevel:'4'},
-    {...base, Country: noc, RecordLevelId:'4'},
-    {...base, NOC: noc},
-    {...base, Noc: noc},
-    {...base, Country: noc},
-  ];
+  // National records are RecordLevelId = 4. Filter by NOC server-side; also enforce client-side.
+  const params = {RecordLevelId:'4', NOC: noc, RBP:'All'};
+  if(catCode) params.Cat = catCode;
 
   try{
-    const {items, data, tried} = await tryRecordQueries(variants);
-    if(!items.length){ recDiagnostic(area, tried, data); return; }
-    // Enforce NOC match client-side: a national record for GER must be held by a GER athlete.
-    // (Some query variants — those that drop the level filter — can return other nations.)
-    const filtered = items.filter(r=>{
-      const n = String(recNoc(r)).toUpperCase();
-      return n === noc;
-    });
-    const finalItems = filtered.length ? filtered : items; // fall back if NOC field is absent
-    const note = filtered.length
-      ? `${filtered.length} records held by ${noc}`
-      : `${items.length} records (note: could not verify NOC field — showing all returned)`;
-    area.innerHTML = renderRecordTable(finalItems, `National Records — ${noc}`, note);
+    let res = await fetch(`${BASE_REC}?${new URLSearchParams(params).toString()}`);
+    let data = res.ok ? await res.json() : {items:[]};
+    let items = data.items||[];
+
+    // If the NOC param wasn't honoured, fetch all level-4 records and filter locally.
+    if(!items.length){
+      const p2 = {RecordLevelId:'4', RBP:'All'};
+      if(catCode) p2.Cat = catCode;
+      const r2 = await fetch(`${BASE_REC}?${new URLSearchParams(p2).toString()}`);
+      if(r2.ok){ data = await r2.json(); items = data.items||[]; }
+    }
+
+    // Always enforce NOC match — a German record must belong to GER.
+    const filtered = items.filter(r => String(r.NOC||'').toUpperCase() === noc);
+
+    if(!filtered.length){
+      area.innerHTML=`<div class="records-section"><div class="state-box" style="padding:40px"><p>No national records found for <strong>${noc}</strong>.<br><span style="font-size:12px">Either none are registered in the World Archery system for this country, or they fall outside the selected category.</span></p></div></div>`;
+      return;
+    }
+    area.innerHTML = renderRecordTable(filtered, `National Records — ${noc}`, `${filtered.length} records held by ${noc}`);
   }catch(e){
     area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
@@ -1541,7 +1559,8 @@ populateNocSelect(document.getElementById('athleteCountry'), 'All countries');
 populateNocSelect(document.getElementById('nrNoc'), null);
 // Default national-records country to Germany
 document.getElementById('nrNoc').value = 'GER';
-fetchCompetitions(1);
+// Athletes is the landing page → load the world rankings first
+fetchAthletes(1);
 </script>
 </body>
 </html>
