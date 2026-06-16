@@ -373,6 +373,18 @@
     }
     .api-notice strong{color:var(--gold)}
 
+    /* ── SORT TOGGLE ── */
+    .sort-toggle{
+      display:flex;align-items:center;gap:7px;
+      background:var(--night-mid);border:1px solid var(--border);color:var(--cream);
+      font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+      padding:6px 13px;border-radius:8px;cursor:pointer;transition:all .2s;
+    }
+    .sort-toggle:hover{border-color:var(--gold);color:var(--gold)}
+    .sort-toggle #athleteSortArrow,.sort-toggle .sort-arrow{
+      font-size:14px;color:var(--gold);font-weight:700;
+    }
+
     /* ── RECORDS SUB-NAV ── */
     .rec-subnav{
       padding:14px 22px;font-size:13px;font-weight:600;cursor:pointer;
@@ -445,7 +457,7 @@
   <!-- HERO -->
   <header class="hero">
     <div class="hero-text">
-      <p class="hero-eyebrow">🏹 International Archery Federation</p>
+      <p class="hero-eyebrow">🏹 World Archery</p>
       <h1 class="hero-title">WORLD<br><span>ARCHERY</span><br>DATA</h1>
       <p class="hero-sub">Competitions, athletes and world ranking data in real time from the official World Archery API.</p>
     </div>
@@ -503,11 +515,11 @@
     </div>
     <div class="control-group">
       <label>From</label>
-      <input type="date" id="compStart"/>
+      <input type="date" id="compStart" lang="en-GB"/>
     </div>
     <div class="control-group">
       <label>To</label>
-      <input type="date" id="compEnd"/>
+      <input type="date" id="compEnd" lang="en-GB"/>
     </div>
     <div class="control-group">
       <label>Country (NOC)</label>
@@ -515,11 +527,11 @@
              style="text-transform:uppercase;max-width:100px"/>
     </div>
     <div class="control-group">
-      <label>WRE</label>
+      <label>World Ranking Event</label>
       <select id="compWRE">
-        <option value="0">All</option>
-        <option value="1">WRE only</option>
-        <option value="-1">No WRE</option>
+        <option value="0">All competitions</option>
+        <option value="1">Ranking events only</option>
+        <option value="-1">Non-ranking only</option>
       </select>
     </div>
     <button class="btn" id="compSearchBtn" onclick="fetchCompetitions(1)">Search</button>
@@ -565,6 +577,15 @@
       <label>Country (NOC)</label>
       <input type="text" id="athleteCountry" placeholder="e.g. GER" maxlength="3" style="min-width:80px;max-width:90px;text-transform:uppercase"/>
     </div>
+    <div class="control-group">
+      <label>Per page</label>
+      <select id="athletePerPage">
+        <option value="15">15</option>
+        <option value="30">30</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
     <button class="btn" id="athleteSearchBtn" onclick="fetchAthletes()">Search</button>
   </div>
 
@@ -574,6 +595,10 @@
     <div class="section-header">
       <h2 class="section-title">World Rankings</h2>
       <div class="section-line"></div>
+      <button class="sort-toggle" id="athleteSortToggle" onclick="toggleAthleteSort()">
+        <span id="athleteSortLabel">Rank: best first</span>
+        <span id="athleteSortArrow">↓</span>
+      </button>
       <div class="section-count" id="athleteCount">—</div>
     </div>
     <div id="athleteGrid" class="athlete-grid"></div>
@@ -660,6 +685,52 @@
 
 </div><!-- /page-countries -->
 
+<!-- FOOTER / IMPRESSUM -->
+<footer style="border-top:1px solid var(--border);margin-top:60px;padding:32px 6vw;background:var(--night-mid)">
+  <div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start">
+    <div style="max-width:420px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;margin-bottom:8px">WORLD <span style="color:var(--gold)">ARCHERY</span> DATA</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6">
+        An unofficial data viewer built on the public World Archery API.
+        Not affiliated with or endorsed by the World Archery Federation.
+        All competition, athlete and record data is property of World Archery.
+      </p>
+    </div>
+    <div>
+      <button onclick="openImprint()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Imprint / Impressum</button>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:24px;opacity:.7">
+    Data source: api.worldarchery.org · Built as a demonstration project
+  </div>
+</footer>
+
+<!-- IMPRINT MODAL -->
+<div class="overlay" id="imprintOverlay" onclick="closeImprint()"></div>
+<div id="imprintModal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;z-index:101;background:var(--night-light);border:1px solid var(--border);border-radius:14px;padding:32px;max-width:520px;width:calc(100vw - 40px);max-height:85vh;overflow-y:auto;transition:opacity .25s,transform .25s">
+  <button onclick="closeImprint()" style="position:absolute;top:14px;right:14px;background:var(--night-mid);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin-bottom:4px">Imprint / Impressum</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Information pursuant to § 5 TMG (German Telemedia Act)</div>
+
+  <div style="font-size:13px;line-height:1.7">
+    <div class="panel-section-title" style="margin-top:0">Provider</div>
+    <p style="margin-bottom:16px">[Your name / organisation]<br>[Street and number]<br>[Postal code, city]<br>[Country]</p>
+
+    <div class="panel-section-title">Contact</div>
+    <p style="margin-bottom:16px">Email: [your email address]<br>Phone: [optional]</p>
+
+    <div class="panel-section-title">Responsible for content</div>
+    <p style="margin-bottom:16px">[Your name], address as above (per § 18 Abs. 2 MStV)</p>
+
+    <div class="panel-section-title">Disclaimer</div>
+    <p style="margin-bottom:12px">This is an independent, non-commercial project. It is not affiliated with, authorised by, or endorsed by the World Archery Federation.</p>
+    <p style="margin-bottom:12px">All sporting data (competitions, athletes, rankings, records) is retrieved live from the public World Archery API and remains the property of World Archery. Athlete photographs are served directly by World Archery.</p>
+    <p style="margin-bottom:12px">Despite careful review, no liability is accepted for the accuracy, completeness or timeliness of the data displayed. External links are the responsibility of their respective operators.</p>
+
+    <div class="panel-section-title">Data source</div>
+    <p>api.worldarchery.org — © World Archery Federation, Maison du Sport International, Avenue de Rhodanie 54, 1007 Lausanne, Switzerland.</p>
+  </div>
+</div>
 <!-- DETAIL PANEL (for competitions + athletes) -->
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
 <aside class="detail-panel" id="detailPanel">
@@ -678,7 +749,7 @@ const PHOTO_BASE = 'https://extranet.worldarchery.org/ProfilePictures/?Id=';
 
 function formatDate(d){
   if(!d) return '—';
-  return new Date(d).toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'numeric'});
+  return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 }
 function getStatus(c){
   if(c.IsLive) return{label:'LIVE',cls:'badge-live'};
@@ -731,6 +802,20 @@ function closePanel(){
   document.getElementById('detailPanel').classList.remove('open');
 }
 
+// ── Imprint modal ──
+function openImprint(){
+  document.getElementById('imprintOverlay').classList.add('show');
+  const m=document.getElementById('imprintModal');
+  m.style.opacity='1'; m.style.pointerEvents='all';
+  m.style.transform='translate(-50%,-50%) scale(1)';
+}
+function closeImprint(){
+  document.getElementById('imprintOverlay').classList.remove('show');
+  const m=document.getElementById('imprintModal');
+  m.style.opacity='0'; m.style.pointerEvents='none';
+  m.style.transform='translate(-50%,-50%) scale(.96)';
+}
+
 // ═══════════════════════════════════ COMPETITIONS ═══════════════════════════
 let compTab='all', compPage=1, compTotal=0;
 const COMP_RBP=12;
@@ -781,11 +866,7 @@ async function fetchCompetitions(page=1){
     const data=await res.json();
     const items=data.items||[];
     compTotal=data.pageInfo?.totalResults||items.length;
-    const today=new Date(); today.setHours(0,0,0,0);
     document.getElementById('statTotal').textContent=compTotal.toLocaleString('en');
-    document.getElementById('statLive').textContent=items.filter(c=>c.IsLive).length;
-    document.getElementById('statUpcoming').textContent=items.filter(c=>!c.IsLive&&new Date(c.DFrom)>today).length;
-    document.getElementById('statWRE').textContent=items.filter(c=>c.WorldRankingEvent).length;
     const filtered=compFilterTab(items);
     document.getElementById('compCount').textContent=compTotal.toLocaleString('en')+' results';
     if(!filtered.length){
@@ -794,11 +875,50 @@ async function fetchCompetitions(page=1){
       grid.innerHTML=filtered.map(renderCompCard).join('');
     }
     renderPagination('comp',compTotal,page,COMP_RBP,fetchCompetitions);
+    // Fetch accurate totals for the stat bar (not just current page) in parallel
+    updateCompStats();
   }catch(e){
     grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><p>Error: ${e.message}</p></div>`;
   }finally{
     document.getElementById('compSearchBtn').disabled=false;
   }
+}
+
+// Query totalResults for a variant of the current filter (returns a count)
+async function countComps(extra){
+  const search=document.getElementById('compSearch').value.trim();
+  const sd=document.getElementById('compStart').value;
+  const ed=document.getElementById('compEnd').value;
+  const country=document.getElementById('compCountry').value.trim().toUpperCase();
+  const p=new URLSearchParams();
+  if(search) p.set('fText',search);
+  if(sd) p.set('StartDate',sd);
+  if(ed) p.set('EndDate',ed);
+  if(country) p.set('Country',country);
+  p.set('Cancelled','-1');
+  p.set('RBP','1');
+  p.set('Page','0');
+  for(const[k,v] of Object.entries(extra||{})) p.set(k,v);
+  try{
+    const r=await fetch(`${BASE_COMP}?${p.toString()}`);
+    if(!r.ok) return null;
+    const d=await r.json();
+    return d.pageInfo?.totalResults ?? (d.items?.length||0);
+  }catch{ return null; }
+}
+
+async function updateCompStats(){
+  // Live now, upcoming (start date >= today), and WRE — each as a true total
+  const today=new Date().toISOString().slice(0,10);
+  const [live, upcoming, wre] = await Promise.all([
+    countComps({Live:'true'}),
+    countComps({StartDate:today}),   // overrides "from" with today → upcoming/ongoing
+    countComps({WorldRankingEvent:'1'}),
+  ]);
+  const set=(id,v)=>{document.getElementById(id).textContent = (v==null?'—':v.toLocaleString('en'));};
+  set('statLive', live);
+  set('statUpcoming', upcoming);
+  set('statWRE', wre);
 }
 
 function renderCompCard(c){
@@ -874,10 +994,20 @@ document.getElementById('compCountry').addEventListener('keydown',e=>{if(e.key==
 
 // ═══════════════════════════════════ ATHLETES ═══════════════════════════════
 let athletePage=1, athleteTotal=0;
-const ATHLETE_RBP=15;
+let athleteRBP=15;
+let athleteSortAsc=true; // true = best rank first (#1 at top)
+
+function toggleAthleteSort(){
+  athleteSortAsc=!athleteSortAsc;
+  document.getElementById('athleteSortLabel').textContent =
+    athleteSortAsc ? 'Rank: best first' : 'Rank: lowest first';
+  document.getElementById('athleteSortArrow').textContent = athleteSortAsc ? '↓' : '↑';
+  fetchAthletes(1);
+}
 
 async function fetchAthletes(page=1){
   athletePage=page;
+  athleteRBP=parseInt(document.getElementById('athletePerPage').value,10)||15;
   const grid=document.getElementById('athleteGrid');
   const pag=document.getElementById('athletePagination');
   grid.innerHTML=`<div class="state-box" style="grid-column:1/-1"><div class="spinner"></div><p>Loading world rankings …</p></div>`;
@@ -892,16 +1022,17 @@ async function fetchAthletes(page=1){
     p.set('CatCode',cat);
     if(search) p.set('fText',search);
     if(country) p.set('Country',country);
-    p.set('SortBy','RANKING');
-    p.set('RBP',ATHLETE_RBP);
+    p.set('SortBy', athleteSortAsc ? 'RANKING' : '-RANKING');
+    p.set('RBP',athleteRBP);
     p.set('Page',page-1);
 
     const url=`https://api.worldarchery.org/v3/WORLDRANKINGS/?${p.toString()}`;
     const res=await fetch(url);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data=await res.json();
-    const items=data.items||[];
+    let items=data.items||[];
     athleteTotal=data.pageInfo?.totalResults||items.length;
+    if(!athleteSortAsc) items=[...items].sort((a,b)=>(b.Rnk||0)-(a.Rnk||0));
     document.getElementById('athleteCount').textContent=athleteTotal.toLocaleString('en')+' athletes ('+cat+')';
 
     if(!items.length){
@@ -909,7 +1040,7 @@ async function fetchAthletes(page=1){
     } else {
       grid.innerHTML=items.map(renderAthleteCard).join('');
     }
-    renderPagination('athlete',athleteTotal,page,ATHLETE_RBP,fetchAthletes);
+    renderPagination('athlete',athleteTotal,page,athleteRBP,fetchAthletes);
   }catch(e){
     grid.innerHTML='';
     const n=document.getElementById('athleteNotice');
@@ -1014,42 +1145,69 @@ document.getElementById('athleteSearch').addEventListener('keydown',e=>{if(e.key
 
 // ═══════════════════════════════════ RECORDS ═══════════════════════════════════
 
-// Map record level IDs to display labels
+// Record level codes used by the WA system (best-effort; verified by trying alternatives)
 const REC_LEVEL_LABELS = {1:'World Record',2:'Olympic Record',3:'World Cup Record',5:'World Championships Record'};
 
-// Cat code → readable label
 const CAT_LABELS = {
   RM:'Recurve Men',RW:'Recurve Women',CM:'Compound Men',CW:'Compound Women',
   RM10:'Recurve Men Indoor',RW10:'Recurve Women Indoor',
   CM10:'Compound Men Indoor',CW10:'Compound Women Indoor',
   BM:'Barebow Men',BW:'Barebow Women',
 };
-function catLabel(c){return CAT_LABELS[c]||c;}
+function catLabel(c){return CAT_LABELS[c]||c||'—';}
 
-// Group records by Discipline then Category
+// Flexible field getter — checks several possible key spellings
+function pick(obj, ...keys){
+  for(const k of keys){
+    if(obj && obj[k]!==undefined && obj[k]!==null && obj[k]!=='') return obj[k];
+  }
+  return undefined;
+}
+
+function recDisc(r){ return pick(r,'DisDescr','Discipline','Dis','DisciplineDescr','EventType')||'Records'; }
+function recCat(r){ return pick(r,'CatCode','Cat','Category','CategoryCode')||''; }
+
 function groupRecords(items){
   const groups={};
   items.forEach(r=>{
-    const disc=r.DisDescr||r.Dis||'Other';
-    const cat=r.CatCode||r.Cat||'';
+    const disc=recDisc(r);
+    const cat=recCat(r);
     const key=`${disc}||${cat}`;
     if(!groups[key]) groups[key]={disc,cat,label:catLabel(cat),items:[]};
     groups[key].items.push(r);
   });
-  return Object.values(groups).sort((a,b)=>a.disc.localeCompare(b.disc)||a.cat.localeCompare(b.cat));
+  return Object.values(groups).sort((a,b)=>String(a.disc).localeCompare(b.disc)||String(a.cat).localeCompare(b.cat));
+}
+
+function recHolders(r){
+  // Try array of athletes first
+  const arr = r.Athletes || r.Members || r.Holders;
+  if(Array.isArray(arr) && arr.length){
+    return arr.map(a=>{
+      const fn = pick(a,'FName','FamilyName','LastName')||'';
+      const gn = pick(a,'GName','GivenName','FirstName')||'';
+      return a.WNameOrd ? `${fn} ${gn}` : `${gn} ${fn}`.trim();
+    }).join(' / ');
+  }
+  // Single athlete inline
+  const fn = pick(r,'FName','FamilyName','AthleteFName');
+  const gn = pick(r,'GName','GivenName','AthleteGName');
+  if(fn||gn) return `${gn||''} ${fn||''}`.trim();
+  return pick(r,'AthleteName','Name','Holder')||'—';
 }
 
 function recTableRows(items){
   return items.map(r=>{
-    const holders = r.Athletes?.map(a=>
-      a.WNameOrd ? `${a.FName} ${a.GName}` : `${a.GName} ${a.FName}`
-    ).join(' / ') || r.AthleteName || '—';
-    const noc = r.Athletes?.[0]?.NOC || r.NOC || '';
-    const event = r.EventDescr || r.Event || '—';
-    const score = r.Score ?? r.Pts ?? '—';
-    const place = r.Place ? `${r.Place}${r.Country?' ('+r.Country+')':''}` : (r.CompName||'');
-    const date  = r.Date ? formatDate(r.Date) : (r.DFrom ? formatDate(r.DFrom) : '—');
-    const isTeam = r.IsTeam || (r.Athletes?.length > 1);
+    const holders = recHolders(r);
+    const noc   = pick(r,'NOC','Noc','Country','CountryCode') || (r.Athletes?.[0]?.NOC) || '';
+    const event = pick(r,'EventDescr','Event','EventName','RecordType','TypeDescr','Distance') || '—';
+    const score = pick(r,'Score','Pts','Points','Value','Result') ?? '—';
+    const placeRaw = pick(r,'Place','Location','City');
+    const cName = pick(r,'CompName','Competition','Event','TournamentName');
+    const place = placeRaw ? `${placeRaw}` : (cName||'');
+    const dRaw  = pick(r,'Date','DFrom','RecordDate','DateSet');
+    const date  = dRaw ? formatDate(dRaw) : '—';
+    const isTeam = r.IsTeam || (Array.isArray(r.Athletes) && r.Athletes.length>1);
     return `<tr>
       <td class="event-cell">${event}${isTeam?' <span style="font-size:10px;color:var(--muted)">(Team)</span>':''}</td>
       <td class="score-cell">${score}</td>
@@ -1072,8 +1230,8 @@ function renderRecordTable(groups, title, subtitle){
       ${groups.map(g=>`
         <div class="rec-group">
           <div class="rec-group-title">
-            ${g.label||g.cat}
-            <span class="rec-group-disc">${g.disc}</span>
+            ${g.label||g.cat||'Records'}
+            ${g.disc?`<span class="rec-group-disc">${g.disc}</span>`:''}
           </div>
           <div style="overflow-x:auto">
             <table class="rec-table">
@@ -1088,6 +1246,39 @@ function renderRecordTable(groups, title, subtitle){
     </div>`;
 }
 
+function recDiagnostic(area, tried, lastData){
+  // Show what we tried and a sample of the raw response, so it's clear whether
+  // the API genuinely has no data or the field/param names differ.
+  const sample = lastData ? JSON.stringify(lastData, null, 2).slice(0, 1200) : '(no response body)';
+  area.innerHTML=`
+    <div class="records-section">
+      <div class="state-box" style="padding:32px;align-items:flex-start;text-align:left">
+        <p style="margin-bottom:10px">No records were returned by the World Archery API for this query.</p>
+        <p style="font-size:12px;margin-bottom:12px">Tried: ${tried.map(t=>`<code style="background:var(--night-mid);padding:1px 5px;border-radius:3px">${t}</code>`).join(', ')}</p>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:6px">Raw response sample (for diagnostics):</p>
+        <pre style="font-size:11px;background:var(--night-mid);border:1px solid var(--border);border-radius:8px;padding:12px;max-width:100%;overflow:auto;color:var(--muted);white-space:pre-wrap">${sample.replace(/</g,'&lt;')}</pre>
+      </div>
+    </div>`;
+}
+
+// Try a list of query-param variants, return {items, data, query} for the first non-empty
+async function tryRecordQueries(variants){
+  let lastData=null; const tried=[];
+  for(const v of variants){
+    const qs = new URLSearchParams(v).toString();
+    tried.push(qs);
+    try{
+      const res = await fetch(`${BASE_REC}?${qs}`);
+      if(!res.ok) continue;
+      const data = await res.json();
+      lastData = data;
+      const items = data.items||[];
+      if(items.length) return {items, data, query:qs, tried};
+    }catch(e){ /* keep trying */ }
+  }
+  return {items:[], data:lastData, query:null, tried};
+}
+
 // ── Sub-nav toggle ──
 let recordMode = 'world';
 function switchRecordMode(mode, btn){
@@ -1097,6 +1288,7 @@ function switchRecordMode(mode, btn){
   document.getElementById('wr-controls').style.display  = mode==='world'    ? 'flex' : 'none';
   document.getElementById('nr-controls').style.display  = mode==='national' ? 'flex' : 'none';
   document.getElementById('recordsArea').innerHTML = '';
+  if(mode==='world') fetchWorldRecords();
 }
 
 // ── World Records ──
@@ -1105,18 +1297,25 @@ async function fetchWorldRecords(){
   const catCode= document.getElementById('wrCat').value;
   const area   = document.getElementById('recordsArea');
   area.innerHTML=`<div class="records-section"><div class="state-box"><div class="spinner"></div><p>Loading records …</p></div></div>`;
+
+  // Try several parameter spellings the API might expect
+  const base = {RBP:'All'};
+  if(catCode) base.CatCode = catCode;
+  const variants = [
+    {...base, RecordLevelId: level},
+    {...base, RecordLevel: level},
+    {...base, LevelId: level},
+    {...base, Level: level},
+    {...base, RecordTypeId: level},
+    {...base}, // no level filter at all → see everything
+  ];
+
   try{
-    const p = new URLSearchParams();
-    p.set('RecordLevelId', level);
-    if(catCode) p.set('CatCode', catCode);
-    p.set('RBP','All');
-    const res = await fetch(`${BASE_REC}?${p.toString()}`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const items = data.items||[];
+    const {items, data, tried} = await tryRecordQueries(variants);
+    if(!items.length){ recDiagnostic(area, tried, data); return; }
     const groups = groupRecords(items);
-    const levelLabel = REC_LEVEL_LABELS[level]||`Level ${level}`;
-    area.innerHTML = renderRecordTable(groups, levelLabel+'s', `${items.length} records across all disciplines`);
+    const levelLabel = REC_LEVEL_LABELS[level]||`Records`;
+    area.innerHTML = renderRecordTable(groups, levelLabel+'s', `${items.length} records across ${groups.length} categories`);
   }catch(e){
     area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
@@ -1134,42 +1333,26 @@ async function fetchNationalRecords(){
   if(!noc){ alert('Please enter a NOC code (e.g. GER)'); return; }
   const area = document.getElementById('recordsArea');
   area.innerHTML=`<div class="records-section"><div class="state-box"><div class="spinner"></div><p>Loading national records for ${noc} …</p></div></div>`;
+
+  const base = {RBP:'All'};
+  if(catCode) base.CatCode = catCode;
+  // National record level is commonly id 4; try with both NOC param spellings,
+  // with and without the level filter (some deployments key national records purely off NOC).
+  const variants = [
+    {...base, NOC: noc, RecordLevelId:'4'},
+    {...base, Noc: noc, RecordLevelId:'4'},
+    {...base, NOC: noc, RecordLevel:'4'},
+    {...base, Country: noc, RecordLevelId:'4'},
+    {...base, NOC: noc},
+    {...base, Noc: noc},
+    {...base, Country: noc},
+  ];
+
   try{
-    const p = new URLSearchParams();
-    p.set('NOC', noc);           // national record level filter
-    p.set('RecordLevelId', '4'); // Level 4 = National Record in WA system
-    if(catCode) p.set('CatCode', catCode);
-    p.set('RBP','All');
-    const res = await fetch(`${BASE_REC}?${p.toString()}`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const items = data.items||[];
-
-    // Also try fetching with Noc param if NOC returns nothing
-    if(!items.length){
-      const p2 = new URLSearchParams();
-      p2.set('Noc', noc);
-      p2.set('RecordLevelId','4');
-      if(catCode) p2.set('CatCode', catCode);
-      p2.set('RBP','All');
-      const res2 = await fetch(`${BASE_REC}?${p2.toString()}`);
-      if(res2.ok){
-        const data2 = await res2.json();
-        const items2 = data2.items||[];
-        if(items2.length){
-          const groups2 = groupRecords(items2);
-          area.innerHTML = renderRecordTable(groups2, `National Records — ${noc}`, `${items2.length} records`);
-          return;
-        }
-      }
-    }
-
-    if(!items.length){
-      area.innerHTML=`<div class="records-section"><div class="state-box"><p>No national records found for <strong>${noc}</strong>.<br><span style="font-size:12px">This may mean no national records are registered in the World Archery system for this country, or the NOC code is incorrect.</span></p></div></div>`;
-      return;
-    }
+    const {items, data, tried} = await tryRecordQueries(variants);
+    if(!items.length){ recDiagnostic(area, tried, data); return; }
     const groups = groupRecords(items);
-    area.innerHTML = renderRecordTable(groups, `National Records — ${noc}`, `${items.length} records`);
+    area.innerHTML = renderRecordTable(groups, `National Records — ${noc}`, `${items.length} records across ${groups.length} categories`);
   }catch(e){
     area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
