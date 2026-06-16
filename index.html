@@ -267,6 +267,18 @@
     .ranking-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px}
     .ranking-pts{font-size:12px;color:var(--muted);margin-top:2px}
 
+    /* ── POINTS BY EVENT ── */
+    .pts-list{display:flex;flex-direction:column;gap:4px}
+    .pts-row{
+      display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+      background:var(--night-mid);border:1px solid var(--border);border-radius:6px;
+      padding:8px 11px;font-size:12px;
+    }
+    .pts-event{color:var(--cream);font-weight:500}
+    .pts-date{color:var(--muted);font-weight:400}
+    .pts-place{color:var(--muted);font-size:11px;white-space:nowrap}
+    .pts-val{color:var(--gold);font-weight:700;white-space:nowrap}
+
     /* ── COUNTRIES / RECORDS ── */
     .country-search-bar{
       display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;
@@ -405,6 +417,17 @@
 
     /* ── RECORDS TABLE ── */
     .records-section{padding:28px 6vw 0}
+    .rec-division-header{
+      display:flex;align-items:center;gap:10px;
+      font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;
+      color:var(--gold);padding-bottom:8px;margin-bottom:16px;
+      border-bottom:2px solid var(--border);
+    }
+    .rec-division-count{
+      font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+      color:var(--muted);background:var(--night-mid);
+      padding:2px 9px;border-radius:20px;border:1px solid var(--border);
+    }
     .rec-group{margin-bottom:36px}
     .rec-group-title{
       font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;
@@ -522,9 +545,8 @@
       <input type="date" id="compEnd" lang="en-GB"/>
     </div>
     <div class="control-group">
-      <label>Country (NOC)</label>
-      <input type="text" id="compCountry" placeholder="e.g. GER" maxlength="3"
-             style="text-transform:uppercase;max-width:100px"/>
+      <label>Country</label>
+      <select id="compCountry"></select>
     </div>
     <div class="control-group">
       <label>World Ranking Event</label>
@@ -574,8 +596,8 @@
       </select>
     </div>
     <div class="control-group">
-      <label>Country (NOC)</label>
-      <input type="text" id="athleteCountry" placeholder="e.g. GER" maxlength="3" style="min-width:80px;max-width:90px;text-transform:uppercase"/>
+      <label>Country</label>
+      <select id="athleteCountry"></select>
     </div>
     <div class="control-group">
       <label>Per page</label>
@@ -646,9 +668,8 @@
   <!-- NATIONAL RECORDS controls -->
   <div id="nr-controls" class="controls" style="padding-top:24px;display:none">
     <div class="control-group">
-      <label>Country (NOC)</label>
-      <input type="text" id="nrNoc" placeholder="e.g. GER" maxlength="3"
-             style="text-transform:uppercase;max-width:110px"/>
+      <label>Country</label>
+      <select id="nrNoc"></select>
     </div>
     <div class="control-group">
       <label>Category</label>
@@ -665,19 +686,6 @@
       </select>
     </div>
     <button class="btn" onclick="fetchNationalRecords()">Load</button>
-
-    <!-- Quick-select nations -->
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-self:flex-end">
-      <span style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);align-self:center">Quick:</span>
-      <button class="noc-chip" onclick="quickNoc('GER')">GER</button>
-      <button class="noc-chip" onclick="quickNoc('USA')">USA</button>
-      <button class="noc-chip" onclick="quickNoc('KOR')">KOR</button>
-      <button class="noc-chip" onclick="quickNoc('FRA')">FRA</button>
-      <button class="noc-chip" onclick="quickNoc('ITA')">ITA</button>
-      <button class="noc-chip" onclick="quickNoc('IND')">IND</button>
-      <button class="noc-chip" onclick="quickNoc('NED')">NED</button>
-      <button class="noc-chip" onclick="quickNoc('TUR')">TUR</button>
-    </div>
   </div>
 
   <!-- Results -->
@@ -746,6 +754,39 @@ const BASE_ARES  = 'https://api.worldarchery.org/v3/ATHLETERESULTS/';
 const BASE_CRES  = 'https://api.worldarchery.org/v3/COUNTRYRESULTS/';
 const BASE_REC   = 'https://api.worldarchery.org/v3/RECORDS/';
 const PHOTO_BASE = 'https://extranet.worldarchery.org/ProfilePictures/?Id=';
+
+// ── NOC list (World Archery member nations, common set) ──
+const NOC_LIST = [
+  ['KOR','South Korea'],['USA','United States'],['FRA','France'],['ITA','Italy'],
+  ['GER','Germany'],['NED','Netherlands'],['GBR','Great Britain'],['IND','India'],
+  ['TUR','Turkey'],['MEX','Mexico'],['JPN','Japan'],['CHN','China'],
+  ['TPE','Chinese Taipei'],['ESP','Spain'],['CAN','Canada'],['AUS','Australia'],
+  ['DEN','Denmark'],['SWE','Sweden'],['POL','Poland'],['UKR','Ukraine'],
+  ['BEL','Belgium'],['AUT','Austria'],['SUI','Switzerland'],['CZE','Czechia'],
+  ['SVK','Slovakia'],['SLO','Slovenia'],['FIN','Finland'],['NOR','Norway'],
+  ['IRL','Ireland'],['POR','Portugal'],['GRE','Greece'],['HUN','Hungary'],
+  ['ROU','Romania'],['BUL','Bulgaria'],['CRO','Croatia'],['SRB','Serbia'],
+  ['EST','Estonia'],['LAT','Latvia'],['LTU','Lithuania'],['MDA','Moldova'],
+  ['BRA','Brazil'],['COL','Colombia'],['ARG','Argentina'],['CHI','Chile'],
+  ['CRC','Costa Rica'],['DOM','Dominican Republic'],['PUR','Puerto Rico'],
+  ['IRI','Iran'],['IRQ','Iraq'],['KAZ','Kazakhstan'],['MGL','Mongolia'],
+  ['MAS','Malaysia'],['INA','Indonesia'],['THA','Thailand'],['VIE','Vietnam'],
+  ['PHI','Philippines'],['SGP','Singapore'],['HKG','Hong Kong'],['BAN','Bangladesh'],
+  ['EGY','Egypt'],['RSA','South Africa'],['NGR','Nigeria'],['KEN','Kenya'],
+  ['NZL','New Zealand'],['ISR','Israel'],['KSA','Saudi Arabia'],['UAE','UAE'],
+];
+
+// Populate a <select> with NOC options. allLabel = text for the "any country" option (or null to omit)
+function populateNocSelect(sel, allLabel){
+  if(!sel) return;
+  const opts = [];
+  if(allLabel!==null) opts.push(`<option value="">${allLabel}</option>`);
+  // Sort alphabetically by country name
+  [...NOC_LIST].sort((a,b)=>a[1].localeCompare(b[1])).forEach(([code,name])=>{
+    opts.push(`<option value="${code}">${name} (${code})</option>`);
+  });
+  sel.innerHTML = opts.join('');
+}
 
 function formatDate(d){
   if(!d) return '—';
@@ -990,7 +1031,6 @@ function setCompTab(tab,el){
 }
 
 document.getElementById('compSearch').addEventListener('keydown',e=>{if(e.key==='Enter') fetchCompetitions(1)});
-document.getElementById('compCountry').addEventListener('keydown',e=>{if(e.key==='Enter') fetchCompetitions(1)});
 
 // ═══════════════════════════════════ ATHLETES ═══════════════════════════════
 let athletePage=1, athleteTotal=0;
@@ -1083,16 +1123,48 @@ function renderAthleteCard(r){
   </div>`;
 }
 
+// Render the per-event points contributions for an athlete's rankings (Detailed=true).
+// The detailed ranking item carries an array of the events that contributed points;
+// field names vary, so we probe several and render whatever we find.
+function renderPointsBreakdown(ranks){
+  const blocks = [];
+  ranks.forEach(r=>{
+    const events = r.Events || r.Results || r.Detail || r.Details ||
+                   r.Breakdown || r.Tournaments || r.Comps || r.Competitions;
+    if(!Array.isArray(events) || !events.length) return;
+    const rows = events.map(ev=>{
+      const name = pick(ev,'CompName','Name','EventName','Event','TournamentName','Competition') || '—';
+      const pts  = pick(ev,'Points','Pts','Point','Value','Score');
+      const dt   = pick(ev,'Date','DFrom','CompDate');
+      const place= pick(ev,'Rnk','Rank','Position','Place');
+      return `<div class="pts-row">
+        <div class="pts-event">${name}${dt?`<span class="pts-date"> · ${formatDate(dt)}</span>`:''}</div>
+        ${place!==undefined?`<div class="pts-place">${typeof place==='number'?'Rank '+place:place}</div>`:'<div></div>'}
+        <div class="pts-val">${pts!==undefined?pts+' pts':'—'}</div>
+      </div>`;
+    }).join('');
+    blocks.push(`
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:6px">${r.Cat} — points by event</div>
+        <div class="pts-list">${rows}</div>
+      </div>`);
+  });
+  if(!blocks.length) return '';
+  return `<div class="panel-divider"></div>
+    <div class="panel-section-title">Ranking Points by Event</div>
+    ${blocks.join('')}`;
+}
+
 async function openAthletePanel(id, name, noc){
   openPanel();
   const pc=document.getElementById('panelContent');
   pc.innerHTML=`<div style="padding-top:40px" class="state-box"><div class="spinner"></div><p>Loading athlete data …</p></div>`;
   try{
     const cat=document.getElementById('athleteCat').value;
-    // Load ranking details + recent results in parallel
+    // Load detailed ranking (incl. per-event points breakdown) + recent results in parallel
     const [rankRes, resultsRes] = await Promise.all([
-      fetch(`https://api.worldarchery.org/v3/WORLDRANKINGS/?Id=${id}&SortBy=RANKING&RBP=10`),
-      fetch(`https://api.worldarchery.org/v3/ATHLETERESULTS/?Id=${id}&SortBy=-DATE&RBP=10&IndividualTeam=1`)
+      fetch(`https://api.worldarchery.org/v3/WORLDRANKINGS/?Id=${id}&SortBy=RANKING&Detailed=true&RBP=20`),
+      fetch(`https://api.worldarchery.org/v3/ATHLETERESULTS/?Id=${id}&SortBy=-DATE&RBP=12`)
     ]);
     const rankData   = rankRes.ok   ? await rankRes.json()    : {items:[]};
     const resultsData= resultsRes.ok ? await resultsRes.json() : {items:[]};
@@ -1119,22 +1191,36 @@ async function openAthletePanel(id, name, noc){
             <div class="ranking-lbl">${r.Cat}</div>
             <div class="ranking-pts">${r.Points} pts</div>
           </div>`).join('')}
-      </div>`:''}
+      </div>
+      ${renderPointsBreakdown(ranks)}
+      `:''}
       ${results.length?`
       <div class="panel-divider"></div>
-      <div class="panel-section-title">Recent Results (Individual)</div>
+      <div class="panel-section-title">Recent Results</div>
       <div class="results-list">
-        ${results.map(r=>`
+        ${results.map(r=>{
+          const compName = (typeof r.Name==='object'&&r.Name) ? (r.Name.Name||r.Name.Descr||'—')
+                           : (r.Name||r.NameShort||r.CompName||r.Competition||r.EventName||'—');
+          const place = pick(r,'Place','Location','City','Country');
+          const lvl   = pick(r,'ComLevelDescr','LevelDescr','Level','ComLevel');
+          const cat   = (typeof r.Cat==='object'&&r.Cat) ? (r.Cat.Code||r.Cat.Cat||'') : (r.Cat||r.CatCode||'');
+          const rnk   = pick(r,'Rnk','Rank','Position','FinalRank');
+          const qs    = pick(r,'QuScore','QScore','QualScore');
+          const qr    = pick(r,'QuRnk','QualRank','QRnk');
+          const dt    = pick(r,'DFrom','Date','DateFrom');
+          const metaParts = [dt?formatDate(dt):null, lvl, place].filter(Boolean);
+          return `
           <div class="result-item">
-            <div class="result-rank ${medalRankCls(r.Rnk)}">${r.Rnk||'—'}</div>
+            <div class="result-rank ${medalRankCls(rnk)}">${rnk!==undefined?rnk:'—'}</div>
             <div class="result-info">
-              <div class="result-name">${r.Name||r.NameShort||'—'}</div>
-              <div class="result-meta">${formatDate(r.DFrom)} · ${r.ComLevelDescr||''} · ${r.Country||''}</div>
-              ${r.QuScore?`<div class="result-meta">QR: ${r.QuScore} (Rank ${r.QuRnk||'—'})</div>`:''}
+              <div class="result-name">${compName}</div>
+              ${metaParts.length?`<div class="result-meta">${metaParts.join(' · ')}</div>`:''}
+              ${qs!==undefined?`<div class="result-meta">Qualification: ${qs}${qr!==undefined?` (rank ${qr})`:''}</div>`:''}
             </div>
-            <span class="result-cat">${r.Cat||''}</span>
-          </div>`).join('')}
-      </div>`:`<div class="panel-divider"></div><p style="color:var(--muted);font-size:13px">No individual results found.</p>`}
+            ${cat?`<span class="result-cat">${cat}</span>`:''}
+          </div>`;
+        }).join('')}
+      </div>`:`<div class="panel-divider"></div><p style="color:var(--muted);font-size:13px">No results found.</p>`}
       <div style="height:32px"></div>`;
   }catch(e){
     pc.innerHTML=`<p style="color:var(--muted);padding-top:40px">Error loading data: ${e.message}</p>`;
@@ -1164,8 +1250,8 @@ function pick(obj, ...keys){
   return undefined;
 }
 
-function recDisc(r){ return pick(r,'DisDescr','Discipline','Dis','DisciplineDescr','EventType')||'Records'; }
-function recCat(r){ return pick(r,'CatCode','Cat','Category','CategoryCode')||''; }
+function recDisc(r){ return resolveText(r.DisDescr)||resolveText(r.Discipline)||resolveText(r.Dis)||resolveText(r.DisciplineDescr)||resolveText(r.EventType)||'Records'; }
+function recCat(r){ return resolveText(r.CatCode)||resolveText(r.Cat)||resolveText(r.Category)||resolveText(r.CategoryCode)||''; }
 
 function groupRecords(items){
   const groups={};
@@ -1179,37 +1265,91 @@ function groupRecords(items){
   return Object.values(groups).sort((a,b)=>String(a.disc).localeCompare(b.disc)||String(a.cat).localeCompare(b.cat));
 }
 
+function fmtAthlete(a){
+  if(!a) return '';
+  const fn = pick(a,'FName','FamilyName','LastName')||'';
+  const gn = pick(a,'GName','GivenName','FirstName')||'';
+  if(fn||gn) return (a.WNameOrd ? `${fn} ${gn}` : `${gn} ${fn}`).trim();
+  return (pick(a,'Name','FullName')||'').trim();
+}
+
 function recHolders(r){
-  // Try array of athletes first
-  const arr = r.Athletes || r.Members || r.Holders;
+  // Array of athletes (team records)
+  const arr = r.Athletes || r.Members || r.Holders || r.Team;
   if(Array.isArray(arr) && arr.length){
-    return arr.map(a=>{
-      const fn = pick(a,'FName','FamilyName','LastName')||'';
-      const gn = pick(a,'GName','GivenName','FirstName')||'';
-      return a.WNameOrd ? `${fn} ${gn}` : `${gn} ${fn}`.trim();
-    }).join(' / ');
+    const names = arr.map(fmtAthlete).filter(Boolean);
+    if(names.length) return names.join(' / ');
   }
-  // Single athlete inline
+  // Single nested Athlete object (confirmed WA structure across all endpoints)
+  const single = r.Athlete || r.athlete;
+  if(single && typeof single==='object'){
+    const nm = fmtAthlete(single);
+    if(nm) return nm;
+  }
+  // Inline fields on the record itself
   const fn = pick(r,'FName','FamilyName','AthleteFName');
   const gn = pick(r,'GName','GivenName','AthleteGName');
   if(fn||gn) return `${gn||''} ${fn||''}`.trim();
   return pick(r,'AthleteName','Name','Holder')||'—';
 }
 
+function recNoc(r){
+  // Direct NOC field on the record
+  const direct = pick(r,'NOC','Noc','CountryCode');
+  if(direct) return direct;
+  // Nested single athlete
+  if(r.Athlete && typeof r.Athlete==='object'){
+    const n = pick(r.Athlete,'NOC','Noc'); if(n) return n;
+  }
+  // First athlete of a team
+  const arr = r.Athletes || r.Members || r.Team;
+  if(Array.isArray(arr) && arr[0]){
+    const n = pick(arr[0],'NOC','Noc'); if(n) return n;
+  }
+  return pick(r,'Country')||'';
+}
+
+function recIsTeam(r){
+  if(r.IsTeam===true) return true;
+  if(Array.isArray(r.Athletes) && r.Athletes.length>1) return true;
+  if(Array.isArray(r.Members) && r.Members.length>1) return true;
+  const cat = String(recCat(r));
+  const ev  = String(recEvent(r));
+  // Heuristic: team events usually mention "Team" or category ends with X (e.g. RMX = mixed team)
+  return /team/i.test(cat) || /team/i.test(ev) || /X$/.test(cat);
+}
+
+// Resolve a value that might be a string or a nested object with a descriptive sub-field
+function resolveText(v){
+  if(v===undefined||v===null) return undefined;
+  if(typeof v==='string'||typeof v==='number') return v;
+  if(typeof v==='object') return pick(v,'Descr','Name','Description','Label','Text','Value','Code');
+  return undefined;
+}
+
+function recEvent(r){
+  const candidates = ['EventDescr','Event','EventName','RecordType','RecordTypeDescr',
+                      'TypeDescr','Type','Distance','DistanceDescr','RoundName','Round','Description'];
+  for(const k of candidates){
+    const t = resolveText(r[k]);
+    if(t) return t;
+  }
+  return '—';
+}
+
 function recTableRows(items){
   return items.map(r=>{
     const holders = recHolders(r);
-    const noc   = pick(r,'NOC','Noc','Country','CountryCode') || (r.Athletes?.[0]?.NOC) || '';
-    const event = pick(r,'EventDescr','Event','EventName','RecordType','TypeDescr','Distance') || '—';
-    const score = pick(r,'Score','Pts','Points','Value','Result') ?? '—';
-    const placeRaw = pick(r,'Place','Location','City');
-    const cName = pick(r,'CompName','Competition','Event','TournamentName');
-    const place = placeRaw ? `${placeRaw}` : (cName||'');
-    const dRaw  = pick(r,'Date','DFrom','RecordDate','DateSet');
+    const noc   = recNoc(r);
+    const event = recEvent(r);
+    const score = pick(r,'Score','Pts','Points','Value','Result','Record') ?? '—';
+    const placeRaw = resolveText(r.Place)||resolveText(r.Location)||resolveText(r.City);
+    const cName = resolveText(r.CompName)||resolveText(r.Competition)||resolveText(r.TournamentName)||resolveText(r.CompetitionName)||resolveText(r.Event);
+    const place = [cName, placeRaw].filter(Boolean).join(' · ') || '—';
+    const dRaw  = pick(r,'Date','DFrom','RecordDate','DateSet','DateShot');
     const date  = dRaw ? formatDate(dRaw) : '—';
-    const isTeam = r.IsTeam || (Array.isArray(r.Athletes) && r.Athletes.length>1);
     return `<tr>
-      <td class="event-cell">${event}${isTeam?' <span style="font-size:10px;color:var(--muted)">(Team)</span>':''}</td>
+      <td class="event-cell">${event}</td>
       <td class="score-cell">${score}</td>
       <td>${holders}</td>
       <td class="meta-cell">${noc}</td>
@@ -1219,30 +1359,49 @@ function recTableRows(items){
   }).join('');
 }
 
-function renderRecordTable(groups, title, subtitle){
-  if(!groups.length) return `<div class="state-box" style="padding:40px"><p>No records found.</p></div>`;
+function renderRecordGroups(groups){
+  return groups.map(g=>`
+    <div class="rec-group">
+      <div class="rec-group-title">
+        ${g.label||g.cat||'Records'}
+        ${g.disc?`<span class="rec-group-disc">${g.disc}</span>`:''}
+      </div>
+      <div style="overflow-x:auto">
+        <table class="rec-table">
+          <thead><tr>
+            <th>Event</th><th>Score</th><th>Athlete(s)</th>
+            <th>NOC</th><th>Competition / Location</th><th>Date</th>
+          </tr></thead>
+          <tbody>${recTableRows(g.items)}</tbody>
+        </table>
+      </div>
+    </div>`).join('');
+}
+
+function renderRecordTable(items, title, subtitle){
+  if(!items.length) return `<div class="state-box" style="padding:40px"><p>No records found.</p></div>`;
+  // Split individual vs team, then group each by discipline+category
+  const indiv = items.filter(r=>!recIsTeam(r));
+  const team  = items.filter(r=>recIsTeam(r));
+  const indivGroups = groupRecords(indiv);
+  const teamGroups  = groupRecords(team);
+  const sample = JSON.stringify(items[0]||{}, null, 2).slice(0,1500);
   return `
     <div class="records-section">
       <div style="margin-bottom:24px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.04em">${title}</div>
         ${subtitle?`<div style="font-size:13px;color:var(--muted);margin-top:4px">${subtitle}</div>`:''}
       </div>
-      ${groups.map(g=>`
-        <div class="rec-group">
-          <div class="rec-group-title">
-            ${g.label||g.cat||'Records'}
-            ${g.disc?`<span class="rec-group-disc">${g.disc}</span>`:''}
-          </div>
-          <div style="overflow-x:auto">
-            <table class="rec-table">
-              <thead><tr>
-                <th>Event</th><th>Score</th><th>Athlete(s)</th>
-                <th>NOC</th><th>Competition / Location</th><th>Date</th>
-              </tr></thead>
-              <tbody>${recTableRows(g.items)}</tbody>
-            </table>
-          </div>
-        </div>`).join('')}
+      ${indivGroups.length?`
+        <div class="rec-division-header"><span>🎯 Individual</span><span class="rec-division-count">${indiv.length}</span></div>
+        ${renderRecordGroups(indivGroups)}`:''}
+      ${teamGroups.length?`
+        <div class="rec-division-header" style="margin-top:32px"><span>👥 Team</span><span class="rec-division-count">${team.length}</span></div>
+        ${renderRecordGroups(teamGroups)}`:''}
+      <details style="margin-top:28px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--muted)">Show raw API field names (developer view)</summary>
+        <pre style="font-size:11px;background:var(--night-mid);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;overflow:auto;color:var(--muted);white-space:pre-wrap">${sample.replace(/</g,'&lt;')}</pre>
+      </details>
     </div>`;
 }
 
@@ -1313,20 +1472,14 @@ async function fetchWorldRecords(){
   try{
     const {items, data, tried} = await tryRecordQueries(variants);
     if(!items.length){ recDiagnostic(area, tried, data); return; }
-    const groups = groupRecords(items);
     const levelLabel = REC_LEVEL_LABELS[level]||`Records`;
-    area.innerHTML = renderRecordTable(groups, levelLabel+'s', `${items.length} records across ${groups.length} categories`);
+    area.innerHTML = renderRecordTable(items, levelLabel+'s', `${items.length} records`);
   }catch(e){
     area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
 }
 
 // ── National Records ──
-function quickNoc(noc){
-  document.getElementById('nrNoc').value=noc;
-  fetchNationalRecords();
-}
-
 async function fetchNationalRecords(){
   const noc    = document.getElementById('nrNoc').value.trim().toUpperCase();
   const catCode= document.getElementById('nrCat').value;
@@ -1351,8 +1504,17 @@ async function fetchNationalRecords(){
   try{
     const {items, data, tried} = await tryRecordQueries(variants);
     if(!items.length){ recDiagnostic(area, tried, data); return; }
-    const groups = groupRecords(items);
-    area.innerHTML = renderRecordTable(groups, `National Records — ${noc}`, `${items.length} records across ${groups.length} categories`);
+    // Enforce NOC match client-side: a national record for GER must be held by a GER athlete.
+    // (Some query variants — those that drop the level filter — can return other nations.)
+    const filtered = items.filter(r=>{
+      const n = String(recNoc(r)).toUpperCase();
+      return n === noc;
+    });
+    const finalItems = filtered.length ? filtered : items; // fall back if NOC field is absent
+    const note = filtered.length
+      ? `${filtered.length} records held by ${noc}`
+      : `${items.length} records (note: could not verify NOC field — showing all returned)`;
+    area.innerHTML = renderRecordTable(finalItems, `National Records — ${noc}`, note);
   }catch(e){
     area.innerHTML=`<div class="records-section"><div class="state-box"><p>Error: ${e.message}</p></div></div>`;
   }
@@ -1374,6 +1536,11 @@ function renderPagination(prefix, total, page, rbp, fetchFn){
 const fetchFns={comp:fetchCompetitions, athlete:fetchAthletes};
 
 // ═══════════════════════════════════ INIT ═══════════════════════════════════
+populateNocSelect(document.getElementById('compCountry'), 'All countries');
+populateNocSelect(document.getElementById('athleteCountry'), 'All countries');
+populateNocSelect(document.getElementById('nrNoc'), null);
+// Default national-records country to Germany
+document.getElementById('nrNoc').value = 'GER';
 fetchCompetitions(1);
 </script>
 </body>
