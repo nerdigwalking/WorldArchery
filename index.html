@@ -383,11 +383,60 @@
     }
     .overlay.show{opacity:1;pointer-events:all}
 
-    @media(max-width:640px){
-      .hero{flex-direction:column;gap:24px}
-      .target-wrap{width:180px;height:180px}
-      .controls,.country-search-bar{flex-direction:column}
-      input,select{min-width:unset;width:100%}
+    @media(max-width:760px){
+      nav{flex-wrap:wrap;padding:0 16px;position:sticky;top:0}
+      .nav-brand{
+        width:100%;border-right:none;border-bottom:1px solid var(--border);
+        padding:12px 0;margin-right:0;font-size:18px;
+      }
+      .nav-tab{padding:12px 14px;font-size:13px;flex:1;text-align:center}
+
+      .section,.controls,.country-search-bar,.records-section,.records-panel{padding-left:16px;padding-right:16px}
+      .stats-bar{margin-left:16px;margin-right:16px}
+      .api-notice{margin-left:16px;margin-right:16px}
+
+      .hero{flex-direction:column;gap:20px;padding:32px 16px 28px;text-align:center}
+      .hero-text{max-width:100%}
+      .hero-sub{margin-left:auto;margin-right:auto}
+      .target-wrap{width:160px;height:160px}
+
+      .controls,.country-search-bar{flex-direction:column;gap:12px}
+      .control-group{width:100%}
+      input,select,.btn,.btn-ghost{min-width:unset;width:100%}
+      .controls .btn,.country-search-bar .btn,.country-search-bar .btn-ghost{align-self:stretch}
+
+      .detail-panel{width:100vw;padding:20px 16px}
+
+      .stats-bar{grid-template-columns:1fr 1fr}
+      .stat-value{font-size:30px}
+
+      .athlete-grid,.comp-grid{grid-template-columns:1fr}
+
+      table.rec-table{font-size:12px;min-width:560px}
+      table.rec-table th,table.rec-table td{padding:8px 9px}
+
+      .section-header{flex-wrap:wrap;gap:8px}
+      .sort-toggle{order:3}
+
+      .rec-subnav{padding:12px 14px;font-size:13px;flex:1;text-align:center}
+      .rec-subnav-bar{padding-left:0!important;padding-right:0!important}
+
+      .app-modal{padding:24px 20px;width:calc(100vw - 24px);max-height:88vh}
+
+      footer{padding:28px 16px}
+      footer > div:first-child{flex-direction:column;gap:18px}
+
+      .pts-row{grid-template-columns:1fr auto;gap:6px}
+      .pts-place{display:none}
+
+      .bio-stats-grid{grid-template-columns:1fr 1fr}
+      .ranking-grid{grid-template-columns:1fr 1fr}
+    }
+
+    @media(max-width:400px){
+      .stats-bar{grid-template-columns:1fr}
+      .bio-stats-grid,.ranking-grid{grid-template-columns:1fr}
+      .hero-title{font-size:40px}
     }
 
     /* ── NOTICE ── */
@@ -397,6 +446,30 @@
       margin:16px 6vw 0;line-height:1.5;
     }
     .api-notice strong{color:var(--gold)}
+
+    /* ── MODALS (imprint, feedback) ── */
+    .app-modal{
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);
+      opacity:0;pointer-events:none;z-index:101;
+      background:var(--night-light);border:1px solid var(--border);
+      border-radius:14px;padding:32px;max-width:520px;width:calc(100vw - 40px);
+      max-height:85vh;overflow-y:auto;transition:opacity .25s,transform .25s;
+    }
+    .app-modal.open{opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1)}
+    .modal-close-btn{
+      position:absolute;top:14px;right:14px;background:var(--night-mid);
+      border:1px solid var(--border);color:var(--muted);width:32px;height:32px;
+      border-radius:50%;cursor:pointer;font-size:16px;
+    }
+    /* ── FOOTER BUTTONS ── */
+    .footer-btn{
+      background:none;border:1px solid var(--border);color:var(--muted);
+      font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+      padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s;
+    }
+    .footer-btn:hover{border-color:var(--gold);color:var(--gold)}
+    .footer-btn-primary{background:rgba(200,151,58,.12);border-color:rgba(200,151,58,.35);color:var(--gold)}
+    .footer-btn-primary:hover{background:rgba(200,151,58,.2)}
 
     /* ── SORT TOGGLE ── */
     .sort-toggle{
@@ -638,7 +711,7 @@
 <div class="page" id="page-countries">
 
   <!-- Sub-nav: World Records vs National Records -->
-  <div style="background:var(--night-mid);border-bottom:1px solid var(--border);padding:0 6vw;display:flex;gap:0">
+  <div class="rec-subnav-bar" style="background:var(--night-mid);border-bottom:1px solid var(--border);padding:0 6vw;display:flex;gap:0">
     <button class="rec-subnav active" id="subnav-world" onclick="switchRecordMode('world',this)">🌍 World Records</button>
     <button class="rec-subnav" id="subnav-national" onclick="switchRecordMode('national',this)">🏳️ National Records</button>
   </div>
@@ -726,8 +799,9 @@
         All competition, athlete and record data is property of World Archery.
       </p>
     </div>
-    <div>
-      <button onclick="openImprint()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Imprint / Impressum</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="openFeedback()" class="footer-btn footer-btn-primary">💡 Feedback &amp; Ideas</button>
+      <button onclick="openImprint()" class="footer-btn">Imprint / Impressum</button>
     </div>
   </div>
   <div style="font-size:11px;color:var(--muted);margin-top:24px;opacity:.7">
@@ -737,8 +811,8 @@
 
 <!-- IMPRINT MODAL -->
 <div class="overlay" id="imprintOverlay" onclick="closeImprint()"></div>
-<div id="imprintModal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;z-index:101;background:var(--night-light);border:1px solid var(--border);border-radius:14px;padding:32px;max-width:520px;width:calc(100vw - 40px);max-height:85vh;overflow-y:auto;transition:opacity .25s,transform .25s">
-  <button onclick="closeImprint()" style="position:absolute;top:14px;right:14px;background:var(--night-mid);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+<div id="imprintModal" class="app-modal">
+  <button onclick="closeImprint()" class="modal-close-btn">✕</button>
   <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin-bottom:4px">Imprint / Impressum</div>
   <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Information pursuant to § 5 TMG (German Telemedia Act)</div>
 
@@ -759,6 +833,40 @@
 
     <div class="panel-section-title">Data source</div>
     <p>api.worldarchery.org — © World Archery Federation, Maison du Sport International, Avenue de Rhodanie 54, 1007 Lausanne, Switzerland.</p>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="overlay" id="feedbackOverlay" onclick="closeFeedback()"></div>
+<div id="feedbackModal" class="app-modal">
+  <button onclick="closeFeedback()" class="modal-close-btn">✕</button>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin-bottom:4px">Feedback &amp; Ideas</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Found a bug, missing a feature, or have an idea? Let us know.</div>
+
+  <div id="feedbackForm">
+    <div class="control-group" style="width:100%;margin-bottom:14px">
+      <label>Type</label>
+      <select id="fbType" style="width:100%">
+        <option value="Idea / Feature request">💡 Idea / Feature request</option>
+        <option value="Bug report">🐞 Bug report</option>
+        <option value="Data issue">📊 Data issue</option>
+        <option value="Other">💬 Other</option>
+      </select>
+    </div>
+    <div class="control-group" style="width:100%;margin-bottom:14px">
+      <label>Your message</label>
+      <textarea id="fbMessage" rows="5" placeholder="Describe your idea or the issue …"
+        style="width:100%;background:var(--night-mid);border:1px solid var(--border);color:var(--cream);font-family:'Inter',sans-serif;font-size:14px;padding:11px 13px;border-radius:8px;outline:none;resize:vertical"></textarea>
+    </div>
+    <div class="control-group" style="width:100%;margin-bottom:18px">
+      <label>Your email (optional)</label>
+      <input type="email" id="fbEmail" placeholder="you@example.com — only if you want a reply"
+        style="width:100%"/>
+    </div>
+    <button class="btn" style="width:100%;justify-content:center" onclick="submitFeedback()">Send feedback</button>
+    <p style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5">
+      This opens your email app with the message pre-filled. No data is stored or sent automatically.
+    </p>
   </div>
 </div>
 <!-- DETAIL PANEL (for competitions + athletes) -->
@@ -870,15 +978,33 @@ function closePanel(){
 // ── Imprint modal ──
 function openImprint(){
   document.getElementById('imprintOverlay').classList.add('show');
-  const m=document.getElementById('imprintModal');
-  m.style.opacity='1'; m.style.pointerEvents='all';
-  m.style.transform='translate(-50%,-50%) scale(1)';
+  document.getElementById('imprintModal').classList.add('open');
 }
 function closeImprint(){
   document.getElementById('imprintOverlay').classList.remove('show');
-  const m=document.getElementById('imprintModal');
-  m.style.opacity='0'; m.style.pointerEvents='none';
-  m.style.transform='translate(-50%,-50%) scale(.96)';
+  document.getElementById('imprintModal').classList.remove('open');
+}
+
+// ── Feedback modal ──
+function openFeedback(){
+  document.getElementById('feedbackOverlay').classList.add('show');
+  document.getElementById('feedbackModal').classList.add('open');
+}
+function closeFeedback(){
+  document.getElementById('feedbackOverlay').classList.remove('show');
+  document.getElementById('feedbackModal').classList.remove('open');
+}
+function submitFeedback(){
+  const type = document.getElementById('fbType').value;
+  const msg  = document.getElementById('fbMessage').value.trim();
+  const email= document.getElementById('fbEmail').value.trim();
+  if(!msg){ alert('Please enter a message.'); return; }
+  // Replace with your own address before publishing:
+  const TO = 'feedback@example.com';
+  const subject = `[World Archery Data] ${type}`;
+  const body = `${msg}\n\n— — —\nType: ${type}\nFrom: ${email||'(no email provided)'}\nPage: ${location.href}`;
+  window.location.href = `mailto:${TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  closeFeedback();
 }
 
 // ═══════════════════════════════════ COMPETITIONS ═══════════════════════════
@@ -1488,7 +1614,9 @@ async function fetchWorldRecords(){
     const res = await fetch(`${BASE_REC}?${new URLSearchParams(params).toString()}`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const items = data.items||[];
+    let items = data.items||[];
+    // The API does not reliably honour the Cat parameter — enforce it client-side.
+    if(catCode) items = items.filter(r => String(r.Cat||'') === catCode);
     if(!items.length){
       area.innerHTML=`<div class="records-section"><div class="state-box" style="padding:40px"><p>No records found for this level/category.</p></div></div>`;
       return;
@@ -1526,7 +1654,9 @@ async function fetchNationalRecords(){
     }
 
     // Always enforce NOC match — a German record must belong to GER.
-    const filtered = items.filter(r => String(r.NOC||'').toUpperCase() === noc);
+    // Also enforce category client-side, as the Cat parameter is not reliably honoured.
+    let filtered = items.filter(r => String(r.NOC||'').toUpperCase() === noc);
+    if(catCode) filtered = filtered.filter(r => String(r.Cat||'') === catCode);
 
     if(!filtered.length){
       area.innerHTML=`<div class="records-section"><div class="state-box" style="padding:40px"><p>No national records found for <strong>${noc}</strong>.<br><span style="font-size:12px">Either none are registered in the World Archery system for this country, or they fall outside the selected category.</span></p></div></div>`;
